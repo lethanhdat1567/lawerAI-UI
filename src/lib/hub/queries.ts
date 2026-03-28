@@ -1,0 +1,131 @@
+// src/lib/hub/queries.ts — client-side queries over mock data
+
+import {
+  getAuthorById,
+  getCategoryById,
+  mockCategories,
+  mockPosts,
+} from "@/lib/hub/mock-data";
+import type {
+  HubCommentNode,
+  HubCommentUI,
+  HubOversightVersionUI,
+  HubPostDetail,
+  HubPostListItem,
+  HubSortMode,
+} from "@/lib/hub/types";
+
+const EXCERPT_LEN = 180;
+
+function excerptFromBody(body: string): string {
+  const flat = body.replace(/\*\*([^*]+)\*\*/g, "$1").replace(/\n+/g, " ").trim();
+  if (flat.length <= EXCERPT_LEN) return flat;
+  return `${flat.slice(0, EXCERPT_LEN).trim()}…`;
+}
+
+function recordToListItem(p: (typeof mockPosts)[0]): HubPostListItem {
+  const author = getAuthorById(p.authorId);
+  const category = getCategoryById(p.categoryId);
+  return {
+    id: p.id,
+    slug: p.slug,
+    title: p.title,
+    excerpt: excerptFromBody(p.body),
+    status: p.status,
+    category,
+    author,
+    createdAt: p.createdAt,
+    updatedAt: p.updatedAt,
+    commentCount: p.comments.length,
+  };
+}
+
+export function listHubPosts(filters: {
+  q?: string;
+  categorySlug?: string | null;
+  sort: HubSortMode;
+}): HubPostListItem[] {
+  const q = (filters.q ?? "").trim().toLowerCase();
+  const catSlug = filters.categorySlug?.trim() || null;
+
+  let rows = mockPosts.filter((p) => p.status === "PUBLISHED");
+
+  if (catSlug) {
+    const cat = mockCategories.find((c) => c.slug === catSlug);
+    if (cat) {
+      rows = rows.filter((p) => p.categoryId === cat.id);
+    } else {
+      rows = [];
+    }
+  }
+
+  if (q) {
+    rows = rows.filter((p) => {
+      const hay = `${p.title} ${p.body}`.toLowerCase();
+      return hay.includes(q);
+    });
+  }
+
+  const sorted = [...rows].sort((a, b) => {
+    const da = filters.sort === "updated" ? a.updatedAt : a.createdAt;
+    const db = filters.sort === "updated" ? b.updatedAt : b.createdAt;
+    return db.localeCompare(da);
+  });
+
+  return sorted.map(recordToListItem);
+}
+
+export function getPostBySlug(slug: string): HubPostDetail | null {
+  const p = mockPosts.find((x) => x.slug === slug);
+  if (!p || p.status !== "PUBLISHED") return null;
+  const base = recordToListItem(p);
+  return {
+    ...base,
+    body: p.body,
+    comments: p.comments,
+    oversightVersions: p.oversightVersions,
+  };
+}
+
+export function buildCommentTree(comments: HubCommentUI[]): HubCommentNode[] {
+  const withAuthors: HubCommentNode[] = comments.map((c) => ({
+    ...c,
+    author: getAuthorById(c.authorId),
+    replies: [],
+  }));
+
+  const byId = new Map(withAuthors.map((c) => [c.id, c]));
+  const roots: HubCommentNode[] = [];
+
+  for (const c of withAuthors) {
+    if (c.parentId && byId.has(c.parentId)) {
+      byId.get(c.parentId)!.replies.push(c);
+    } else {
+      roots.push(c);
+    }
+  }
+
+  const sortNodes = (nodes: HubCommentNode[]) => {
+    nodes.sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+    for (const n of nodes) sortNodes(n.replies);
+  };
+  sortNodes(roots);
+  return roots;
+}
+
+export function getCurrentOversight(
+  versions: HubOversightVersionUI[]
+): HubOversightVersionUI | null {
+  const current = versions.find((v) => v.isCurrent);
+  if (current) return current;
+  if (versions.length === 0) return null;
+  return [...versions].sort((a, b) => b.version - a.version)[0];
+}
+
+export function parseSuggestionItems(json: unknown): string[] {
+  if (!json || typeof json !== "object") return [];
+  const o = json as Record<string, unknown>;
+  const items = o.items;
+  if (!Array.isArray(items)) return [];
+  return items.filter((x): x is string => typeof x === "string");
+}
