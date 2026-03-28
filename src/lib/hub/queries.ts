@@ -40,6 +40,21 @@ function recordToListItem(p: (typeof mockPosts)[0]): HubPostListItem {
   };
 }
 
+/** Bài Hub của tác giả (demo: lọc theo `username` trùng mock author). */
+export function listMyHubPosts(
+  username: string | null | undefined,
+): HubPostListItem[] {
+  const u = username?.trim();
+  if (!u) return [];
+  const rows = mockPosts.filter((p) => {
+    const a = getAuthorById(p.authorId);
+    return a.username === u;
+  });
+  return [...rows]
+    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+    .map(recordToListItem);
+}
+
 export function listHubPosts(filters: {
   q?: string;
   categorySlug?: string | null;

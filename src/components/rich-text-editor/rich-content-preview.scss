@@ -1,0 +1,12 @@
+/* Read-only preview: same ProseMirror node styles as the editor, no toolbar. */
+.rich-content-preview {
+  .tiptap.ProseMirror.simple-editor {
+    padding: 1rem 1rem 1.25rem;
+    min-height: 120px;
+    outline: none;
+  }
+}
+
+.rich-content-preview--empty {
+  min-height: 120px;
+}

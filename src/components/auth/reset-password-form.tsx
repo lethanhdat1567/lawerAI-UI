@@ -2,57 +2,47 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 import { AuthField } from "@/components/auth/auth-field";
 import { AuthPasswordInput } from "@/components/auth/auth-password-input";
-import { PASSWORD_MIN_LENGTH } from "@/components/auth/auth-validation";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import {
+  isValidEmail,
+  PASSWORD_MIN_LENGTH,
+} from "@/components/auth/auth-validation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ApiError } from "@/lib/api/errors";
+import { authService } from "@/services/authService";
 
-interface ResetPasswordFormProps {
-  token: string | undefined;
-}
+export function ResetPasswordForm() {
+  const searchParams = useSearchParams();
+  const emailHint = searchParams.get("email")?.trim() ?? "";
 
-export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
+  const [email, setEmail] = useState(emailHint);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState<{
+    type: "ok" | "error";
+    text: string;
+  } | null>(null);
   const [pending, setPending] = useState(false);
 
-  if (!token?.trim()) {
-    return (
-      <div className="space-y-4 text-center">
-        <p className="text-sm leading-relaxed text-muted-foreground">
-          Liên khôi phục không hợp lệ hoặc đã hết hạn. Vui lòng yêu cầu gửi lại email.
-        </p>
-        <Link
-          href="/forgot-password"
-          className={cn(
-            buttonVariants({ size: "lg" }),
-            "h-11 w-full rounded-xl border border-border bg-primary text-base font-semibold text-primary-foreground hover:bg-primary/90",
-          )}
-        >
-          Yêu cầu link mới
-        </Link>
-        <p className="text-sm text-muted-foreground">
-          <Link href="/login" className="font-semibold text-primary underline-offset-4 hover:underline">
-            Về trang đăng nhập
-          </Link>
-        </p>
-      </div>
-    );
-  }
-
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setErrors({});
-    setMessage("");
+    setMessage(null);
 
     const fd = new FormData(e.currentTarget);
+    const emailVal = String(fd.get("email") ?? "").trim();
+    const code = String(fd.get("code") ?? "").trim();
     const password = String(fd.get("password") ?? "");
     const confirm = String(fd.get("confirmPassword") ?? "");
 
     const next: Record<string, string> = {};
+    if (!emailVal) next.email = "Nhập email.";
+    else if (!isValidEmail(emailVal)) next.email = "Email không hợp lệ.";
+    if (!code) next.code = "Nhập mã từ email.";
     if (!password) next.password = "Nhập mật khẩu mới.";
     else if (password.length < PASSWORD_MIN_LENGTH)
       next.password = `Mật khẩu tối thiểu ${PASSWORD_MIN_LENGTH} ký tự.`;
@@ -65,19 +55,57 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
     }
 
     setPending(true);
-    window.setTimeout(() => {
+    try {
+      const { message: msg } = await authService.resetPassword({
+        email: emailVal,
+        code,
+        newPassword: password,
+      });
+      setMessage({ type: "ok", text: msg });
+    } catch (err) {
+      setMessage({
+        type: "error",
+        text:
+          err instanceof ApiError
+            ? err.message
+            : "Không đặt lại được mật khẩu.",
+      });
+    } finally {
       setPending(false);
-      setMessage(
-        "Chức năng đang kết nối API. Token demo đã được gửi từ URL; backend sẽ xác thực và cập nhật mật khẩu.",
-      );
-    }, 450);
+    }
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5" noValidate>
-      <p className="rounded-lg border border-border bg-muted px-3 py-2 font-mono text-xs text-muted-foreground break-all [overflow-wrap:anywhere]">
-        token=<span className="text-foreground">{token}</span>
+      <p className="text-sm leading-relaxed text-muted-foreground">
+        Nhập email đã dùng khi yêu cầu khôi phục và mã gồm các chữ số gửi qua email.
       </p>
+
+      <AuthField label="Email" htmlFor="reset-email" error={errors.email}>
+        <Input
+          id="reset-email"
+          name="email"
+          type="email"
+          autoComplete="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          aria-invalid={Boolean(errors.email)}
+          placeholder="ban@example.com"
+          className="h-10"
+        />
+      </AuthField>
+
+      <AuthField label="Mã từ email" htmlFor="reset-code" error={errors.code}>
+        <Input
+          id="reset-code"
+          name="code"
+          inputMode="numeric"
+          autoComplete="one-time-code"
+          aria-invalid={Boolean(errors.code)}
+          placeholder="123456"
+          className="h-10 font-mono tracking-widest"
+        />
+      </AuthField>
 
       <AuthField label="Mật khẩu mới" htmlFor="reset-password" error={errors.password}>
         <AuthPasswordInput
@@ -102,8 +130,15 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
       </AuthField>
 
       {message ? (
-        <p className="text-sm text-muted-foreground" role="status">
-          {message}
+        <p
+          className={
+            message.type === "error"
+              ? "text-sm text-red-400"
+              : "text-sm text-primary"
+          }
+          role="status"
+        >
+          {message.text}
         </p>
       ) : null}
 

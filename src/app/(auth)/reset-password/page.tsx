@@ -1,28 +1,24 @@
 // src/app/(auth)/reset-password/page.tsx
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
 import { AuthPageLayout } from "@/components/auth/auth-page-layout";
 import { ResetPasswordForm } from "@/components/auth/reset-password-form";
 
 export const metadata: Metadata = {
   title: "Đặt lại mật khẩu",
-  description: "Đặt mật khẩu mới bằng token từ email.",
+  description: "Đặt mật khẩu mới bằng mã từ email.",
 };
 
-interface ResetPasswordPageProps {
-  searchParams: Promise<{ token?: string }>;
-}
-
-export default async function ResetPasswordPage({ searchParams }: ResetPasswordPageProps) {
-  const params = await searchParams;
-  const token = params.token;
-
+export default function ResetPasswordPage() {
   return (
     <AuthPageLayout
       title="Đặt lại mật khẩu"
-      description="Chọn mật khẩu mới cho tài khoản. Liên kết thường có dạng ?token=… từ email khôi phục."
+      description="Dùng mã số đã gửi tới email cùng với email tài khoản."
     >
-      <ResetPasswordForm token={token} />
+      <Suspense fallback={<p className="text-sm text-muted-foreground">Đang tải…</p>}>
+        <ResetPasswordForm />
+      </Suspense>
     </AuthPageLayout>
   );
 }

@@ -2,31 +2,28 @@
 "use client";
 
 import type { FormEvent } from "react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
+import { RichContentPreview } from "@/components/rich-text-editor/rich-content-preview";
+import { RichTextEditor } from "@/components/rich-text-editor/rich-text-editor";
+import { isHtmlContentEffectivelyEmpty } from "@/lib/editor/plain-excerpt";
 import { mockCategories } from "@/lib/hub/mock-data";
 
 export function HubNewPostForm() {
   const [title, setTitle] = useState("");
-  const [categoryId, setCategoryId] = useState<string>(mockCategories[0]?.id ?? "");
+  const [categoryId, setCategoryId] = useState<string>(
+    mockCategories[0]?.id ?? "",
+  );
   const [body, setBody] = useState("");
   const [message, setMessage] = useState<string | null>(null);
 
-  const previewExcerpt = useMemo(() => {
-    const t = body.replace(/\*\*([^*]+)\*\*/g, "$1").replace(/\n+/g, " ").trim();
-    if (t.length <= 160) return t || "…";
-    return `${t.slice(0, 160)}…`;
-  }, [body]);
-
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!title.trim() || !body.trim()) {
+    if (!title.trim() || isHtmlContentEffectivelyEmpty(body)) {
       setMessage("Vui lòng nhập tiêu đề và nội dung.");
       return;
     }
-    setMessage(
-      "Đã ghi nhận trên UI demo — API LawyerAI sẽ xử lý đăng bài sau."
-    );
+    setMessage("Đã ghi nhận.");
   }
 
   return (
@@ -35,7 +32,10 @@ export function HubNewPostForm() {
       className="space-y-8 rounded-2xl border border-border bg-card/40 p-6 backdrop-blur-md sm:p-8"
     >
       <div>
-        <label htmlFor="new-title" className="text-sm font-semibold text-foreground">
+        <label
+          htmlFor="new-title"
+          className="text-sm font-semibold text-foreground"
+        >
           Tiêu đề
         </label>
         <input
@@ -48,7 +48,10 @@ export function HubNewPostForm() {
       </div>
 
       <div>
-        <label htmlFor="new-cat" className="text-sm font-semibold text-foreground">
+        <label
+          htmlFor="new-cat"
+          className="text-sm font-semibold text-foreground"
+        >
           Danh mục
         </label>
         <select
@@ -66,27 +69,30 @@ export function HubNewPostForm() {
       </div>
 
       <div>
-        <label htmlFor="new-body" className="text-sm font-semibold text-foreground">
+        <p
+          id="new-body-label"
+          className="text-sm font-semibold text-foreground"
+        >
           Nội dung
-        </label>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Có thể dùng **in đậm** với cặp dấu sao kép như Markdown đơn giản.
         </p>
-        <textarea
-          id="new-body"
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-          rows={12}
-          className="mt-2 w-full resize-y rounded-xl border border-border bg-background/50 px-3 py-2 font-mono text-sm leading-relaxed focus:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/20"
-          placeholder="Mô tả chi tiết, câu hỏi, và bất kỳ ngữ cảnh nào giúp cộng đồng trả lời…"
-        />
+        <p className="mt-1 text-xs text-muted-foreground">
+          Định dạng đầy đủ: tiêu đề, danh sách, liên kết, hình ảnh, v.v.
+        </p>
+        <div className="mt-2">
+          <RichTextEditor
+            value={body}
+            onChange={setBody}
+            placeholder="Mô tả chi tiết, câu hỏi, và ngữ cảnh giúp cộng đồng trả lời…"
+            aria-labelledby="new-body-label"
+          />
+        </div>
       </div>
 
-      <div className="rounded-xl border border-border bg-muted/40 p-4">
+      <div className="space-y-3">
         <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-          Xem trước đoạn trích
+          Xem trước bài viết
         </p>
-        <p className="mt-2 text-sm text-foreground/90">{previewExcerpt}</p>
+        <RichContentPreview html={body} />
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -94,7 +100,7 @@ export function HubNewPostForm() {
           type="submit"
           className="inline-flex h-11 items-center justify-center rounded-xl bg-primary px-6 text-sm font-semibold text-primary-foreground disabled:opacity-50"
         >
-          Đăng bài (demo)
+          Đăng bài
         </button>
       </div>
 

@@ -4,6 +4,8 @@
 import { ThemeProvider } from "next-themes";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
+import { AuthProvider } from "@/components/auth/auth-provider";
+import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 interface ProvidersProps {
@@ -19,7 +21,12 @@ export function Providers({ children }: ProvidersProps) {
       storageKey="lawyerai-theme"
     >
       <TooltipProvider delay={0}>
-        <NuqsAdapter>{children}</NuqsAdapter>
+        <AuthProvider>
+          <NuqsAdapter>
+            {children}
+            <Toaster />
+          </NuqsAdapter>
+        </AuthProvider>
       </TooltipProvider>
     </ThemeProvider>
   );

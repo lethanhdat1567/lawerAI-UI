@@ -8,8 +8,8 @@ export function isValidEmail(value: string): boolean {
   return EMAIL_RE.test(value.trim());
 }
 
-/** Username: chữ, số, gạch ngang/underscore, 3–32 ký tự (gần với hướng BE) */
-const USERNAME_RE = /^[a-zA-Z0-9_-]{3,32}$/;
+/** Username: khớp BE — chữ, số, underscore; 3–32 ký tự */
+const USERNAME_RE = /^[a-zA-Z0-9_]{3,32}$/;
 
 export function isValidUsername(value: string): boolean {
   return USERNAME_RE.test(value.trim());

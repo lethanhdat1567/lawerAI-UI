@@ -8,13 +8,15 @@ import { AuthField } from "@/components/auth/auth-field";
 import { isValidEmail } from "@/components/auth/auth-validation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ApiError } from "@/lib/api/errors";
+import { authService } from "@/services/authService";
 
 export function ForgotPasswordForm() {
   const [error, setError] = useState("");
   const [sentMessage, setSentMessage] = useState("");
   const [pending, setPending] = useState(false);
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
     setSentMessage("");
@@ -32,19 +34,23 @@ export function ForgotPasswordForm() {
     }
 
     setPending(true);
-    window.setTimeout(() => {
-      setPending(false);
-      setSentMessage(
-        "Đây là giao diện demo: email thật sẽ không được gửi. Khi API sẵn sàng, bạn sẽ nhận link đặt lại mật khẩu.",
+    try {
+      const { message } = await authService.forgotPassword({ email });
+      setSentMessage(message);
+    } catch (err) {
+      setError(
+        err instanceof ApiError ? err.message : "Không gửi được yêu cầu.",
       );
-    }, 500);
+    } finally {
+      setPending(false);
+    }
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5" noValidate>
       <p className="text-sm leading-relaxed text-muted-foreground">
-        Nhập email tài khoản. Nếu khớp với hệ thống, chúng tôi gửi hướng dẫn đặt lại mật
-        khẩu (triển khai qua LawyerAI-api sau).
+        Nhập email tài khoản. Nếu khớp với hệ thống, chúng tôi gửi mã đặt lại mật khẩu qua
+        email.
       </p>
 
       <AuthField label="Email" htmlFor="forgot-email" error={error}>
@@ -71,7 +77,7 @@ export function ForgotPasswordForm() {
         size="lg"
         disabled={pending}
       >
-        {pending ? "Đang gửi…" : "Gửi link khôi phục"}
+        {pending ? "Đang gửi…" : "Gửi mã khôi phục"}
       </Button>
 
       <p className="text-center text-sm text-muted-foreground">

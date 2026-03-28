@@ -1,10 +1,41 @@
 // src/components/auth/auth-google-button.tsx
 "use client";
 
+import { FirebaseError } from "firebase/app";
+import { signInWithPopup } from "firebase/auth";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { ApiError } from "@/lib/api/errors";
+import { applyAuthResponse } from "@/lib/auth/applyAuthResponse";
+import {
+  getFirebaseAuth,
+  googleAuthProvider,
+  isFirebaseConfigured,
+} from "@/lib/firebase/client";
 import { cn } from "@/lib/utils";
+import { authService } from "@/services/authService";
+
+function describeFirebaseAuthError(err: unknown): string | null {
+  if (!(err instanceof FirebaseError)) return null;
+  if (err.code === "auth/configuration-not-found") {
+    return (
+      "Firebase không tải được cấu hình đăng nhập. Kiểm tra: (1) Firebase Console → Authentication → Get started → bật Sign-in method Google; " +
+      "(2) Google Cloud → APIs → bật Identity Toolkit API; " +
+      "(3) API key Web: hạn chế referrer phải gồm localhost và domain production, hoặc tạm thời để không hạn chế khi dev; " +
+      "(4) Authentication → Settings → Authorized domains có localhost; " +
+      "(5) Restart `npm run dev` sau khi sửa .env."
+    );
+  }
+  if (err.code === "auth/unauthorized-domain") {
+    return "Domain chưa được phép: thêm localhost (hoặc domain của bạn) trong Firebase → Authentication → Settings → Authorized domains.";
+  }
+  if (err.code === "auth/popup-closed-by-user") {
+    return "Đã đóng cửa sổ đăng nhập Google.";
+  }
+  return err.message;
+}
 
 function GoogleGlyph({ className }: { className?: string }) {
   return (
@@ -40,24 +71,53 @@ export function AuthGoogleButton({
   disabled = false,
   className,
 }: AuthGoogleButtonProps) {
+  const router = useRouter();
   const [msg, setMsg] = useState("");
+  const [pending, setPending] = useState(false);
+
+  async function handleClick() {
+    setMsg("");
+    if (!isFirebaseConfigured()) {
+      setMsg("Chưa cấu hình Firebase (biến NEXT_PUBLIC_FIREBASE_*).");
+      return;
+    }
+    setPending(true);
+    try {
+      const auth = getFirebaseAuth();
+      const cred = await signInWithPopup(auth, googleAuthProvider);
+      const idToken = await cred.user.getIdToken();
+      const data = await authService.firebaseSignIn({ idToken });
+      await applyAuthResponse(data);
+      router.push("/");
+      router.refresh();
+    } catch (err) {
+      const text =
+        err instanceof ApiError
+          ? err.message
+          : (describeFirebaseAuthError(err) ??
+            (err instanceof Error
+              ? err.message
+              : "Đăng nhập Google thất bại."));
+      setMsg(text);
+    } finally {
+      setPending(false);
+    }
+  }
 
   return (
     <div className="space-y-3">
       <Button
         type="button"
         variant="outline"
-        disabled={disabled}
-        onClick={() =>
-          setMsg("OAuth Google — đang kết nối API (LawyerAI-api).")
-        }
+        disabled={disabled || pending}
+        onClick={() => void handleClick()}
         className={cn(
           "h-11 w-full gap-3 rounded-xl border-border bg-transparent text-base font-medium text-foreground hover:bg-muted",
           className,
         )}
       >
         <GoogleGlyph className="size-5 shrink-0" />
-        {label}
+        {pending ? "Đang xử lý…" : label}
       </Button>
       {msg ? (
         <p className="text-center text-sm text-muted-foreground" role="status">

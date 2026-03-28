@@ -26,6 +26,21 @@ function recordToListItem(p: (typeof mockBlogPosts)[0]): BlogPostListItem {
   };
 }
 
+/** Bài blog của tác giả (gồm DRAFT — demo theo username mock). */
+export function listMyBlogPosts(
+  username: string | null | undefined,
+): BlogPostListItem[] {
+  const u = username?.trim();
+  if (!u) return [];
+  const rows = mockBlogPosts.filter((p) => {
+    const a = getBlogAuthorById(p.authorId);
+    return a.username === u;
+  });
+  return [...rows]
+    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+    .map(recordToListItem);
+}
+
 export function listBlogPosts(filters: {
   q?: string;
   tagSlug?: string | null;

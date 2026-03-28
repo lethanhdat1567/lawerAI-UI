@@ -2,31 +2,31 @@
 "use client";
 
 import { EyeIcon, EyeOffIcon } from "lucide-react";
+import * as React from "react";
 import { useId, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
-interface AuthPasswordInputProps {
-  id?: string;
-  name?: string;
-  autoComplete?: string;
-  placeholder?: string;
-  "aria-invalid"?: boolean;
-  "aria-describedby"?: string;
-  className?: string;
-}
+export type AuthPasswordInputProps = Omit<
+  React.ComponentPropsWithRef<"input">,
+  "type"
+>;
 
-export function AuthPasswordInput({
-  id: idProp,
-  name = "password",
-  autoComplete = "current-password",
-  placeholder,
-  "aria-invalid": ariaInvalid,
-  "aria-describedby": ariaDescribedBy,
-  className,
-}: AuthPasswordInputProps) {
+export const AuthPasswordInput = React.forwardRef<
+  HTMLInputElement,
+  AuthPasswordInputProps
+>(function AuthPasswordInput(
+  {
+    id: idProp,
+    name = "password",
+    autoComplete = "current-password",
+    className,
+    ...rest
+  },
+  ref,
+) {
   const genId = useId();
   const id = idProp ?? genId;
   const [visible, setVisible] = useState(false);
@@ -34,14 +34,13 @@ export function AuthPasswordInput({
   return (
     <div className="relative">
       <Input
+        ref={ref}
         id={id}
         name={name}
         type={visible ? "text" : "password"}
         autoComplete={autoComplete}
-        placeholder={placeholder}
-        aria-invalid={ariaInvalid}
-        aria-describedby={ariaDescribedBy}
         className={cn("h-10 pr-11 md:h-10", className)}
+        {...rest}
       />
       <Button
         type="button"
@@ -59,4 +58,4 @@ export function AuthPasswordInput({
       </Button>
     </div>
   );
-}
+});

@@ -2,11 +2,20 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { MenuIcon } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { LogOutIcon, MenuIcon, UserRoundIcon } from "lucide-react";
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { useState } from "react";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Sheet,
   SheetContent,
@@ -14,9 +23,13 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { signOutClient } from "@/lib/auth/signOutClient";
+import { resolvePublicImageUrl } from "@/lib/media/resolvePublicImageUrl";
 import { mainNavItems, siteName } from "@/lib/site-config";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
+import type { PublicUser } from "@/services/authTypes";
+import { useAuthStore } from "@/stores/auth-store";
 import { useUiStore } from "@/stores/ui-store";
 
 const sheetListVariants = {
@@ -29,11 +42,29 @@ const sheetItemVariants = {
   closed: { opacity: 0, x: 10 },
 };
 
+function userDisplayName(u: PublicUser): string {
+  const d = u.profile.displayName?.trim();
+  if (d) return d;
+  return (u.username?.trim() || u.email.split("@")[0] || u.email).trim();
+}
+
+function userInitial(u: PublicUser): string {
+  const base = userDisplayName(u);
+  return base.slice(0, 1).toUpperCase() || "?";
+}
+
 export function SiteHeader() {
   const pathname = usePathname();
+  const router = useRouter();
   const { scrollY } = useScroll();
   const [scrolled, setScrolled] = useState(false);
   const { mobileNavOpen, setMobileNavOpen } = useUiStore();
+  const user = useAuthStore((s) => s.user);
+  const accessToken = useAuthStore((s) => s.accessToken);
+  const isSignedIn = Boolean(user ?? accessToken);
+  const headerAvatarSrc = user
+    ? resolvePublicImageUrl(user.profile.avatarUrl)
+    : null;
 
   useMotionValueEvent(scrollY, "change", (y) => {
     setScrolled(y > 12);
@@ -45,7 +76,7 @@ export function SiteHeader() {
         "sticky top-0 z-50 border-b transition-[background-color,backdrop-filter,border-color] duration-300",
         scrolled
           ? "border-border/80 bg-background/80 backdrop-blur-md"
-          : "border-transparent bg-transparent"
+          : "border-transparent bg-transparent",
       )}
       initial={false}
     >
@@ -70,7 +101,7 @@ export function SiteHeader() {
                   "text-sm font-medium transition-colors",
                   active
                     ? "text-foreground"
-                    : "text-muted-foreground hover:text-foreground"
+                    : "text-muted-foreground hover:text-foreground",
                 )}
               >
                 {item.label}
@@ -81,18 +112,88 @@ export function SiteHeader() {
 
         <div className="flex items-center gap-1 md:gap-3">
           <ThemeToggle />
-          <Link
-            href="/login"
-            className="hidden rounded-full px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground md:inline-block"
-          >
-            Đăng nhập
-          </Link>
-          <Link
-            href="/register"
-            className="hidden rounded-full px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:text-primary md:inline-block"
-          >
-            Đăng ký
-          </Link>
+          {isSignedIn ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                type="button"
+                className="hidden rounded-full p-0 outline-none focus-visible:ring-2 focus-visible:ring-ring md:inline-flex"
+                aria-label="Tài khoản"
+              >
+                <span className="sr-only">
+                  {user ? userDisplayName(user) : "Tài khoản"}
+                </span>
+                <Avatar className="size-9 border border-border bg-card shadow-sm">
+                  {user ? (
+                    <>
+                      {headerAvatarSrc ? (
+                        <AvatarImage src={headerAvatarSrc} alt="" />
+                      ) : null}
+                      <AvatarFallback className="bg-card text-sm font-semibold text-foreground">
+                        {userInitial(user)}
+                      </AvatarFallback>
+                    </>
+                  ) : (
+                    <AvatarFallback className="bg-card">
+                      <UserRoundIcon className="size-4" aria-hidden />
+                    </AvatarFallback>
+                  )}
+                </Avatar>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-56">
+                {user ? (
+                  <>
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="truncate text-sm font-medium text-foreground">
+                          {userDisplayName(user)}
+                        </span>
+                        <span className="truncate text-xs text-muted-foreground">
+                          {user.email}
+                        </span>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                  </>
+                ) : (
+                  <>
+                    <DropdownMenuLabel className="font-normal text-muted-foreground">
+                      Phiên đăng nhập
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
+                <DropdownMenuItem onClick={() => router.push("/profile")}>
+                  Hồ sơ
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push("/my")}>
+                  Nội dung của tôi
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={() => void signOutClient()}
+                >
+                  <LogOutIcon />
+                  Đăng xuất
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : null}
+          {!isSignedIn ? (
+            <>
+              <Link
+                href="/login"
+                className="hidden rounded-full px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground md:inline-block"
+              >
+                Đăng nhập
+              </Link>
+              <Link
+                href="/register"
+                className="hidden rounded-full px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:text-primary md:inline-block"
+              >
+                Đăng ký
+              </Link>
+            </>
+          ) : null}
           <Link
             href="/assistant"
             className="hidden rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-[0_0_24px_-4px_oklch(0.72_0.22_285/0.65)] transition-[transform,box-shadow] hover:scale-[1.02] hover:shadow-[0_0_32px_-4px_oklch(0.72_0.22_285/0.8)] md:inline-flex"
@@ -140,24 +241,88 @@ export function SiteHeader() {
                     <ThemeToggle />
                   </div>
                 </motion.div>
-                <motion.div variants={sheetItemVariants}>
-                  <Link
-                    href="/login"
-                    onClick={() => setMobileNavOpen(false)}
-                    className="block px-4 py-3 text-sm text-muted-foreground hover:text-foreground"
-                  >
-                    Đăng nhập
-                  </Link>
-                </motion.div>
-                <motion.div variants={sheetItemVariants} className="px-2 pt-2">
-                  <Link
-                    href="/register"
-                    onClick={() => setMobileNavOpen(false)}
-                    className="flex w-full items-center justify-center rounded-full bg-primary py-3 text-sm font-semibold text-primary-foreground"
-                  >
-                    Đăng ký
-                  </Link>
-                </motion.div>
+                {isSignedIn ? (
+                  <>
+                    {user ? (
+                      <motion.div
+                        variants={sheetItemVariants}
+                        className="px-4 py-3"
+                      >
+                        <p className="text-xs font-medium text-muted-foreground">
+                          Đã đăng nhập
+                        </p>
+                        <p className="mt-1 truncate text-sm font-semibold text-foreground">
+                          {userDisplayName(user)}
+                        </p>
+                        <p className="truncate text-xs text-muted-foreground">
+                          {user.email}
+                        </p>
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        variants={sheetItemVariants}
+                        className="px-4 py-3 text-sm text-muted-foreground"
+                      >
+                        Đang tải hồ sơ…
+                      </motion.div>
+                    )}
+                    <motion.div variants={sheetItemVariants}>
+                      <Link
+                        href="/profile"
+                        onClick={() => setMobileNavOpen(false)}
+                        className="block rounded-xl px-4 py-3 text-sm font-semibold text-foreground hover:bg-muted"
+                      >
+                        Hồ sơ
+                      </Link>
+                    </motion.div>
+                    <motion.div variants={sheetItemVariants}>
+                      <Link
+                        href="/my"
+                        onClick={() => setMobileNavOpen(false)}
+                        className="block rounded-xl px-4 py-3 text-sm font-semibold text-foreground hover:bg-muted"
+                      >
+                        Nội dung của tôi
+                      </Link>
+                    </motion.div>
+                    <motion.div variants={sheetItemVariants} className="px-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMobileNavOpen(false);
+                          void signOutClient();
+                        }}
+                        className="flex w-full items-center justify-center gap-2 rounded-full border border-destructive/30 bg-destructive/10 py-3 text-sm font-semibold text-destructive"
+                      >
+                        <LogOutIcon className="size-4" />
+                        Đăng xuất
+                      </button>
+                    </motion.div>
+                  </>
+                ) : (
+                  <>
+                    <motion.div variants={sheetItemVariants}>
+                      <Link
+                        href="/login"
+                        onClick={() => setMobileNavOpen(false)}
+                        className="block px-4 py-3 text-sm text-muted-foreground hover:text-foreground"
+                      >
+                        Đăng nhập
+                      </Link>
+                    </motion.div>
+                    <motion.div
+                      variants={sheetItemVariants}
+                      className="px-2 pt-2"
+                    >
+                      <Link
+                        href="/register"
+                        onClick={() => setMobileNavOpen(false)}
+                        className="flex w-full items-center justify-center rounded-full bg-primary py-3 text-sm font-semibold text-primary-foreground"
+                      >
+                        Đăng ký
+                      </Link>
+                    </motion.div>
+                  </>
+                )}
               </motion.nav>
             </SheetContent>
           </Sheet>

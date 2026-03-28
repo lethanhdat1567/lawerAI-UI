@@ -1,80 +1,77 @@
 // src/components/auth/register-form.tsx
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
 
 import { AuthField } from "@/components/auth/auth-field";
 import { AuthGoogleButton } from "@/components/auth/auth-google-button";
 import { AuthPasswordInput } from "@/components/auth/auth-password-input";
-import {
-  isValidEmail,
-  isValidUsername,
-  PASSWORD_MIN_LENGTH,
-} from "@/components/auth/auth-validation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ApiError } from "@/lib/api/errors";
+import {
+  registerFormSchema,
+  type RegisterFormValues,
+} from "@/lib/validators/registerForm";
+import { authService } from "@/services/authService";
 
 export function RegisterForm() {
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [message, setMessage] = useState("");
-  const [pending, setPending] = useState(false);
+  const [message, setMessage] = useState<{
+    type: "ok" | "error";
+    text: string;
+  } | null>(null);
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setErrors({});
-    setMessage("");
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerFormSchema),
+    defaultValues: {
+      email: "",
+      username: "",
+      displayName: "",
+      password: "",
+      confirmPassword: "",
+    },
+  });
 
-    const fd = new FormData(e.currentTarget);
-    const email = String(fd.get("email") ?? "").trim();
-    const username = String(fd.get("username") ?? "").trim();
-    const displayName = String(fd.get("displayName") ?? "").trim();
-    const password = String(fd.get("password") ?? "");
-    const confirm = String(fd.get("confirmPassword") ?? "");
-
-    const next: Record<string, string> = {};
-    if (!email) next.email = "Nhập email.";
-    else if (!isValidEmail(email)) next.email = "Email không hợp lệ.";
-
-    if (!username) next.username = "Nhập tên đăng nhập.";
-    else if (!isValidUsername(username))
-      next.username = `3–32 ký tự: chữ, số, gạch ngang hoặc gạch dưới.`;
-
-    if (displayName.length > 80)
-      next.displayName = "Tên hiển thị tối đa 80 ký tự.";
-
-    if (!password) next.password = "Nhập mật khẩu.";
-    else if (password.length < PASSWORD_MIN_LENGTH)
-      next.password = `Mật khẩu tối thiểu ${PASSWORD_MIN_LENGTH} ký tự.`;
-
-    if (!confirm) next.confirmPassword = "Nhập lại mật khẩu.";
-    else if (confirm !== password) next.confirmPassword = "Mật khẩu không khớp.";
-
-    if (Object.keys(next).length > 0) {
-      setErrors(next);
-      return;
+  async function onSubmit(data: RegisterFormValues) {
+    setMessage(null);
+    const { email, username, password } = data;
+    try {
+      const res = await authService.register({ email, password, username });
+      reset();
+      setMessage({
+        type: "ok",
+        text: `${res.message} Bạn có thể đăng nhập sau khi xác minh email bằng liên kết đã gửi.`,
+      });
+    } catch (err) {
+      const text =
+        err instanceof ApiError ? err.message : "Đăng ký thất bại. Thử lại sau.";
+      setMessage({ type: "error", text });
     }
-
-    setPending(true);
-    window.setTimeout(() => {
-      setPending(false);
-      setMessage(
-        "Chức năng đang kết nối API. Sau khi đăng ký, bạn có thể cần xác thực email trước khi dùng đầy đủ tính năng.",
-      );
-    }, 400);
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5" noValidate>
-      <AuthField label="Email" htmlFor="reg-email" error={errors.email}>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
+      <AuthField
+        label="Email"
+        htmlFor="reg-email"
+        error={errors.email?.message}
+      >
         <Input
           id="reg-email"
-          name="email"
           type="email"
           autoComplete="email"
           aria-invalid={Boolean(errors.email)}
           placeholder="ban@example.com"
           className="h-10"
+          {...register("email")}
         />
       </AuthField>
 
@@ -82,58 +79,69 @@ export function RegisterForm() {
         label="Tên đăng nhập"
         htmlFor="reg-username"
         hint="Dùng cho URL hồ sơ; không đổi dễ dàng sau này."
-        error={errors.username}
+        error={errors.username?.message}
       >
         <Input
           id="reg-username"
-          name="username"
           autoComplete="username"
           aria-invalid={Boolean(errors.username)}
           placeholder="nguyen_van_a"
           className="h-10"
+          {...register("username")}
         />
       </AuthField>
 
       <AuthField
         label="Tên hiển thị (tuỳ chọn)"
         htmlFor="reg-display"
-        error={errors.displayName}
+        error={errors.displayName?.message}
       >
         <Input
           id="reg-display"
-          name="displayName"
           autoComplete="name"
           aria-invalid={Boolean(errors.displayName)}
           placeholder="Nguyễn Văn A"
           className="h-10"
+          {...register("displayName")}
         />
       </AuthField>
 
-      <AuthField label="Mật khẩu" htmlFor="reg-password" error={errors.password}>
+      <AuthField
+        label="Mật khẩu"
+        htmlFor="reg-password"
+        error={errors.password?.message}
+      >
         <AuthPasswordInput
           id="reg-password"
-          name="password"
           autoComplete="new-password"
           aria-invalid={Boolean(errors.password)}
+          {...register("password")}
         />
       </AuthField>
 
       <AuthField
         label="Xác nhận mật khẩu"
         htmlFor="reg-confirm"
-        error={errors.confirmPassword}
+        error={errors.confirmPassword?.message}
       >
         <AuthPasswordInput
           id="reg-confirm"
-          name="confirmPassword"
           autoComplete="new-password"
           aria-invalid={Boolean(errors.confirmPassword)}
+          {...register("confirmPassword")}
         />
       </AuthField>
 
       {message ? (
-        <p className="text-sm text-muted-foreground" role="status">
-          {message}
+        <p
+          className={
+            message.type === "error"
+              ? "text-sm text-red-400"
+              : "text-sm text-muted-foreground"
+          }
+          role="status"
+        >
+          {message.text}
         </p>
       ) : null}
 
@@ -141,9 +149,9 @@ export function RegisterForm() {
         type="submit"
         className="h-11 w-full rounded-xl border border-border bg-primary text-base font-semibold text-primary-foreground shadow-none hover:bg-primary/90"
         size="lg"
-        disabled={pending}
+        disabled={isSubmitting}
       >
-        {pending ? "Đang xử lý…" : "Tạo tài khoản"}
+        {isSubmitting ? "Đang xử lý…" : "Tạo tài khoản"}
       </Button>
 
       <div className="relative py-1">
@@ -155,7 +163,7 @@ export function RegisterForm() {
         </div>
       </div>
 
-      <AuthGoogleButton label="Đăng ký với Google" disabled={pending} />
+      <AuthGoogleButton label="Đăng ký với Google" disabled={isSubmitting} />
 
       <p className="text-center text-sm text-muted-foreground">
         Đã có tài khoản?{" "}

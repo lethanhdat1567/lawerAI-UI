@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { ArrowLeftIcon } from "lucide-react";
 
+import { HubNewPostAuthGuard } from "@/app/(marketing)/hub/_components/hub-new-post-auth-guard";
 import { HubNewPostForm } from "@/app/(marketing)/hub/_components/hub-new-post-form";
 
 export default function HubNewPostPage() {
@@ -19,11 +20,13 @@ export default function HubNewPostPage() {
           Đăng bài mới
         </h1>
         <p className="mt-3 text-muted-foreground">
-          Điền nội dung bên dưới — đây là giao diện demo, chưa lưu xuống server.
+          Soạn tiêu đề và nội dung; trình soạn hỗ trợ định dạng phong phú.
         </p>
       </header>
       <div className="mt-10">
-        <HubNewPostForm />
+        <HubNewPostAuthGuard>
+          <HubNewPostForm />
+        </HubNewPostAuthGuard>
       </div>
     </div>
   );

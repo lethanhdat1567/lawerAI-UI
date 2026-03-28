@@ -2,6 +2,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { AuthField } from "@/components/auth/auth-field";
@@ -10,8 +11,12 @@ import { AuthPasswordInput } from "@/components/auth/auth-password-input";
 import { isValidEmail } from "@/components/auth/auth-validation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ApiError } from "@/lib/api/errors";
+import { applyAuthResponse } from "@/lib/auth/applyAuthResponse";
+import { authService } from "@/services/authService";
 
 export function LoginForm() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
@@ -21,7 +26,7 @@ export function LoginForm() {
   }>({ type: "idle", text: "" });
   const [pending, setPending] = useState(false);
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setEmailError("");
     setPasswordError("");
@@ -46,13 +51,24 @@ export function LoginForm() {
     if (!ok) return;
 
     setPending(true);
-    window.setTimeout(() => {
-      setPending(false);
-      setFormMessage({
-        type: "info",
-        text: "Chức năng đang kết nối API (LawyerAI-api — session/JWT theo ADR).",
+    try {
+      const data = await authService.login({
+        email: emailVal,
+        password: passwordVal,
       });
-    }, 400);
+      await applyAuthResponse(data);
+      setFormMessage({ type: "info", text: "Đăng nhập thành công." });
+      router.push("/");
+      router.refresh();
+    } catch (err) {
+      const text =
+        err instanceof ApiError
+          ? err.message
+          : "Đăng nhập thất bại. Thử lại sau.";
+      setFormMessage({ type: "error", text });
+    } finally {
+      setPending(false);
+    }
   }
 
   return (

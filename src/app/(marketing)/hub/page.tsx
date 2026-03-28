@@ -1,9 +1,8 @@
 // src/app/(marketing)/hub/page.tsx
 import { Suspense } from "react";
-import Link from "next/link";
-import { ArrowUpRightIcon } from "lucide-react";
 
 import { HubFiltersToolbar } from "@/app/(marketing)/hub/_components/hub-filters-toolbar";
+import { HubNewPostCta } from "@/app/(marketing)/hub/_components/hub-new-post-cta";
 import { HubPageLayout } from "@/app/(marketing)/hub/_components/hub-page-layout";
 import { HubPostGrid } from "@/app/(marketing)/hub/_components/hub-post-grid";
 
@@ -36,15 +35,7 @@ export default function HubPage() {
     <HubPageLayout
       title="Không gian thảo luận"
       description="Đăng tình huống thực tế, nhận phản hồi cộng đồng và xem tóm tắt AI thư ký. Dữ liệu hiển thị là bản demo; sau này đồng bộ từ LawyerAI-api."
-      action={
-        <Link
-          href="/hub/new"
-          className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-[0_0_28px_-6px_oklch(0.62_0.22_285/0.75)] transition-[transform,box-shadow] hover:scale-[1.02] hover:shadow-[0_0_36px_-6px_oklch(0.68_0.2_285/0.9)]"
-        >
-          Đăng bài
-          <ArrowUpRightIcon className="size-4" aria-hidden />
-        </Link>
-      }
+      action={<HubNewPostCta />}
     >
       <Suspense fallback={<HubSkeleton />}>
         <HubFiltersToolbar />
