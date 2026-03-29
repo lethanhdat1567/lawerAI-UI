@@ -1,5 +1,5 @@
 // src/app/(marketing)/privacy/page.tsx
-import { PageShell } from "@/components/layout/page-shell";
+import { PageShell } from "@/components/layout/pageShell";
 
 export default function PrivacyPage() {
   return (

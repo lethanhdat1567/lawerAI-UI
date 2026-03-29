@@ -1,5 +1,5 @@
 // src/app/(admin)/admin/page.tsx
-import { AdminDashboardHome } from "@/components/admin/admin-dashboard-home";
+import { AdminDashboardHome } from "@/app/(admin)/admin/_components/adminDashboardHome";
 
 export default function AdminOverviewPage() {
   return <AdminDashboardHome />;

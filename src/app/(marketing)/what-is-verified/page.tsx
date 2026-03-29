@@ -1,5 +1,5 @@
 // src/app/(marketing)/what-is-verified/page.tsx
-import { PageShell } from "@/components/layout/page-shell";
+import { PageShell } from "@/components/layout/pageShell";
 
 export default function WhatIsVerifiedPage() {
   return (

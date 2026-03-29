@@ -15,10 +15,29 @@ export interface BlogTag {
   name: string;
 }
 
+export interface BlogCommentUI {
+  id: string;
+  blogPostId: string;
+  parentId: string | null;
+  authorId: string;
+  body: string;
+  createdAt: string;
+  likeCount: number;
+}
+
+export interface BlogCommentWithAuthor extends BlogCommentUI {
+  author: BlogAuthor;
+}
+
+export interface BlogCommentNode extends BlogCommentWithAuthor {
+  replies: BlogCommentNode[];
+}
+
 export interface BlogPostListItem {
   id: string;
   slug: string;
   title: string;
+  thumbnailUrl: string | null;
   excerpt: string;
   status: BlogPostStatusUI;
   isVerified: boolean;
@@ -26,6 +45,8 @@ export interface BlogPostListItem {
   author: BlogAuthor;
   createdAt: string;
   updatedAt: string;
+  commentCount: number;
+  likeCount: number;
 }
 
 export interface BlogPostDetail extends BlogPostListItem {
@@ -33,6 +54,8 @@ export interface BlogPostDetail extends BlogPostListItem {
   verifiedAt: string | null;
   verificationNotes: string | null;
   legalCorpusVersion: string | null;
+  comments: BlogCommentWithAuthor[];
+  savedCount: number;
 }
 
 export type BlogSortMode = "new" | "updated";

@@ -1,4 +1,4 @@
-import { MyBlogManage } from "@/app/(marketing)/my/_components/my-blog-manage";
+import { MyBlogManage } from "@/app/(marketing)/my/_components/myBlogManage";
 
 export default function MyBlogPage() {
   return <MyBlogManage />;

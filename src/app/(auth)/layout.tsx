@@ -1,5 +1,5 @@
 // src/app/(auth)/layout.tsx
-import { AuthSplitLayout } from "@/components/auth/auth-split-layout";
+import { AuthSplitLayout } from "@/app/(auth)/_components/authSplitLayout";
 
 interface AuthLayoutProps {
   children: React.ReactNode;

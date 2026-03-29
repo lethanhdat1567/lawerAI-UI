@@ -1,17 +1,14 @@
-// src/app/(admin)/admin/reports/page.tsx
-import { AdminDataPlaceholder } from "@/components/admin/admin-data-placeholder";
-import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { AdminPageHeader } from "@/app/(admin)/admin/_components/adminPageHeader";
+import { AdminReportsManage } from "@/app/(admin)/admin/_components/adminReportsManage";
 
 export default function AdminReportsPage() {
   return (
     <div className="space-y-6">
       <AdminPageHeader
         title="Báo cáo"
-        description="Report — target type (Hub, Bài blog, User, …), trạng thái OPEN / ACTIONED / DISMISSED."
+        description="Report — xử lý báo cáo kiểm duyệt (OPEN → ACTIONED / DISMISSED)."
       />
-      <AdminDataPlaceholder
-        columns={["Loại đích", "ID đích", "Người gửi", "Trạng thái", "Ngày tạo", "Thao tác"]}
-      />
+      <AdminReportsManage />
     </div>
   );
 }

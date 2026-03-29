@@ -4,12 +4,15 @@ import Link from "next/link";
 import { ArrowLeftIcon } from "lucide-react";
 import { notFound } from "next/navigation";
 
-import { HubCommentComposer } from "@/app/(marketing)/hub/_components/hub-comment-composer";
-import { HubCommentTree } from "@/app/(marketing)/hub/_components/hub-comment-tree";
-import { HubOversightPanel } from "@/app/(marketing)/hub/_components/hub-oversight-panel";
-import { HubPostBody } from "@/app/(marketing)/hub/_components/hub-post-body";
-import { HubPostDetailHeader } from "@/app/(marketing)/hub/_components/hub-post-detail-header";
-import { buildCommentTree, getPostBySlug } from "@/lib/hub/queries";
+import { HubCommentComposer } from "@/app/(marketing)/hub/_components/hubCommentComposer";
+import { HubCommentTree } from "@/app/(marketing)/hub/_components/hubCommentTree";
+import { HubOversightPanel } from "@/app/(marketing)/hub/_components/hubOversightPanel";
+import { HubPostBody } from "@/app/(marketing)/hub/_components/hubPostBody";
+import { HubPostDetailHeader } from "@/app/(marketing)/hub/_components/hubPostDetailHeader";
+import { buildCommentTree } from "@/lib/hub/buildCommentTree";
+import { fetchHubPostDetailPublic } from "@/lib/hub/fetchHubPublic";
+
+export const dynamic = "force-dynamic";
 
 interface HubPostPageProps {
   params: Promise<{ slug: string }>;
@@ -19,7 +22,7 @@ export async function generateMetadata({
   params,
 }: HubPostPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = getPostBySlug(slug);
+  const post = await fetchHubPostDetailPublic(slug);
   if (!post) {
     return { title: "Không tìm thấy bài" };
   }
@@ -31,7 +34,7 @@ export async function generateMetadata({
 
 export default async function HubPostPage({ params }: HubPostPageProps) {
   const { slug } = await params;
-  const post = getPostBySlug(slug);
+  const post = await fetchHubPostDetailPublic(slug);
   if (!post) notFound();
 
   const commentTree = buildCommentTree(post.comments);
@@ -53,18 +56,21 @@ export default async function HubPostPage({ params }: HubPostPageProps) {
             <HubPostBody body={post.body} />
           </div>
 
-          <section aria-labelledby="hub-comments-heading" className="border-t border-border pt-10">
+          <section
+            aria-labelledby="hub-comments-heading"
+            className="border-t border-border pt-10"
+          >
             <h2
               id="hub-comments-heading"
               className="font-heading text-xl font-bold tracking-tight"
             >
-              Bình luận ({post.comments.length})
+              Bình luận ({post.commentCount})
             </h2>
             <div className="mt-6">
-              <HubCommentTree nodes={commentTree} />
+              <HubCommentTree postId={post.id} nodes={commentTree} />
             </div>
             <div className="mt-8">
-              <HubCommentComposer />
+              <HubCommentComposer postId={post.id} />
             </div>
           </section>
         </div>

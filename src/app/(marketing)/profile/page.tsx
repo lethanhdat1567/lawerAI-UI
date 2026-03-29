@@ -1,8 +1,8 @@
 // src/app/(marketing)/profile/page.tsx
 import type { Metadata } from "next";
 
-import { PageShell } from "@/components/layout/page-shell";
-import { ProfileForm } from "@/components/profile/profile-form";
+import { PageShell } from "@/components/layout/pageShell";
+import { ProfileForm } from "@/app/(marketing)/profile/_components/profileForm";
 
 export const metadata: Metadata = {
   title: "Hồ sơ",

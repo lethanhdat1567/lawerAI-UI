@@ -1,6 +1,20 @@
 // src/app/(assistant)/assistant/page.tsx
-import { AssistantApp } from "@/components/assistant/assistant-app";
+import dynamic from "next/dynamic";
 import type { Metadata } from "next";
+
+const AssistantAppLazy = dynamic(
+  () =>
+    import("@/app/(assistant)/assistant/_components/assistantApp").then((m) => ({
+      default: m.AssistantApp,
+    })),
+  {
+    loading: () => (
+      <div className="flex h-dvh items-center justify-center text-sm text-muted-foreground">
+        Đang tải trợ lý…
+      </div>
+    ),
+  },
+);
 
 export const metadata: Metadata = {
   title: "Tra cứu",
@@ -9,5 +23,5 @@ export const metadata: Metadata = {
 };
 
 export default function AssistantPage() {
-  return <AssistantApp />;
+  return <AssistantAppLazy />;
 }

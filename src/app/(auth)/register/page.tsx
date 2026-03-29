@@ -1,8 +1,8 @@
 // src/app/(auth)/register/page.tsx
 import type { Metadata } from "next";
 
-import { AuthPageLayout } from "@/components/auth/auth-page-layout";
-import { RegisterForm } from "@/components/auth/register-form";
+import { AuthPageLayout } from "@/app/(auth)/_components/authPageLayout";
+import { RegisterForm } from "@/app/(auth)/_components/registerForm";
 
 export const metadata: Metadata = {
   title: "Tạo tài khoản",

@@ -2,6 +2,7 @@
 
 import type {
   BlogAuthor,
+  BlogCommentWithAuthor,
   BlogPostStatusUI,
   BlogTag,
 } from "@/lib/blog/types";
@@ -40,6 +41,7 @@ export interface BlogPostRecord {
   authorId: string;
   slug: string;
   title: string;
+  thumbnailUrl?: string | null;
   excerpt: string;
   body: string;
   status: BlogPostStatusUI;
@@ -51,6 +53,10 @@ export interface BlogPostRecord {
   createdAt: string;
   updatedAt: string;
   tagSlugs: string[];
+  commentCount?: number;
+  likeCount?: number;
+  savedCount?: number;
+  comments?: BlogCommentWithAuthor[];
 }
 
 export const mockBlogPosts: BlogPostRecord[] = [

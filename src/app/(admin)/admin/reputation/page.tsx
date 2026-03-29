@@ -1,17 +1,15 @@
 // src/app/(admin)/admin/reputation/page.tsx
-import { AdminDataPlaceholder } from "@/components/admin/admin-data-placeholder";
-import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { AdminReputationManage } from "@/app/(admin)/admin/_components/adminReputationManage";
+import { AdminPageHeader } from "@/app/(admin)/admin/_components/adminPageHeader";
 
 export default function AdminReputationPage() {
   return (
     <div className="space-y-6">
       <AdminPageHeader
         title="Uy tín"
-        description="ReputationLedger + UserContributionScore — điều chỉnh ADMIN_BONUS / ADMIN_PENALTY khi có API."
+        description="Sổ cái ReputationLedger — điều chỉnh điểm và xem lịch sử."
       />
-      <AdminDataPlaceholder
-        columns={["User", "Delta", "Lý do", "Tham chiếu", "Ngày"]}
-      />
+      <AdminReputationManage />
     </div>
   );
 }

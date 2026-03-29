@@ -4,7 +4,7 @@
 import { ThemeProvider } from "next-themes";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
-import { AuthProvider } from "@/components/auth/auth-provider";
+import { AuthProvider } from "@/app/(auth)/_components/authProvider";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 

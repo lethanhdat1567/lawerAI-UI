@@ -1,17 +1,14 @@
-// src/app/(admin)/admin/blog/page.tsx
-import { AdminDataPlaceholder } from "@/components/admin/admin-data-placeholder";
-import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { AdminBlogManage } from "@/app/(admin)/admin/_components/adminBlogManage";
+import { AdminPageHeader } from "@/app/(admin)/admin/_components/adminPageHeader";
 
 export default function AdminBlogPage() {
   return (
     <div className="space-y-6">
       <AdminPageHeader
         title="Blog"
-        description="BlogPost — DRAFT / PUBLISHED; isVerified và verifiedBy (kiểm chứng nội dung)."
+        description="BlogPost — DRAFT / PUBLISHED; kiểm chứng nội dung (verified), legal corpus; CRUD đầy đủ."
       />
-      <AdminDataPlaceholder
-        columns={["Tiêu đề", "Slug", "Tác giả", "Trạng thái", "Đã kiểm chứng", "Cập nhật", "Thao tác"]}
-      />
+      <AdminBlogManage />
     </div>
   );
 }

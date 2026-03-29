@@ -2,8 +2,8 @@
 import Link from "next/link";
 import { ArrowUpRightIcon, BookOpenIcon, MessageSquareIcon, ScaleIcon } from "lucide-react";
 
-import { AboutPageLayout } from "@/app/(marketing)/about/_components/about-page-layout";
-import { ArticleBody } from "@/components/article/article-body";
+import { AboutPageLayout } from "@/app/(marketing)/about/_components/aboutPageLayout";
+import { ArticleBody } from "@/components/article/articleBody";
 
 const pillars = [
   {

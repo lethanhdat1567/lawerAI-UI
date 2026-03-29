@@ -5,15 +5,21 @@ import type { ReputationReasonExplainer } from "./types";
 export const REPUTATION_REASON_EXPLAINERS: ReputationReasonExplainer[] = [
   {
     code: "HUB_REPLY_HELPFUL",
-    title: "Trả lời Hub hữu ích",
+    title: "Trả lời / thích Hub hữu ích",
     description:
-      "Điểm khi cộng đồng hoặc hệ thống ghi nhận câu trả lời trong Hub giúp ích cho người đặt câu hỏi.",
+      "Điểm khi người khác thích bình luận của bạn trên Hub (không tính tự thích). Mỗi lượt thích hợp lệ được ghi vào sổ uy tín.",
   },
   {
     code: "BLOG_QUALITY",
-    title: "Chất lượng bài Blog",
+    title: "Xuất bản bài Blog",
     description:
-      "Đóng góp nội dung blog được đánh giá tốt về độ rõ ràng, nguồn và tính hữu ích.",
+      "Điểm một lần khi bài blog chuyển sang xuất bản; thu hồi đối xứng nếu bài trở lại nháp hoặc bị gỡ khỏi công khai theo quy tắc nền tảng.",
+  },
+  {
+    code: "BLOG_COMMENT_HELPFUL",
+    title: "Bình luận Blog được thích",
+    description:
+      "Điểm khi người khác thích bình luận của bạn dưới bài blog (không tính tự thích).",
   },
   {
     code: "MOD_ADJUSTMENT",

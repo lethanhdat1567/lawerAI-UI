@@ -1,17 +1,15 @@
 // src/app/(admin)/admin/hub/page.tsx
-import { AdminDataPlaceholder } from "@/components/admin/admin-data-placeholder";
-import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { AdminHubManage } from "@/app/(admin)/admin/_components/adminHubManage";
+import { AdminPageHeader } from "@/app/(admin)/admin/_components/adminPageHeader";
 
 export default function AdminHubPage() {
   return (
     <div className="space-y-6">
       <AdminPageHeader
         title="Hub"
-        description="HubPost — PUBLISHED / HIDDEN; quản lý danh mục HubCategory."
+        description="HubPost — PUBLISHED / HIDDEN; danh sách, chỉnh sửa, tạo và xóa mềm qua LawyerAI-api (quyền ADMIN)."
       />
-      <AdminDataPlaceholder
-        columns={["Tiêu đề", "Slug", "Danh mục", "Tác giả", "Trạng thái", "Cập nhật", "Thao tác"]}
-      />
+      <AdminHubManage />
     </div>
   );
 }

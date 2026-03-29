@@ -1,8 +1,8 @@
 // src/app/(auth)/verify-email/page.tsx
 import type { Metadata } from "next";
 
-import { AuthPageLayout } from "@/components/auth/auth-page-layout";
-import { VerifyEmailContent } from "@/components/auth/verify-email-content";
+import { AuthPageLayout } from "@/app/(auth)/_components/authPageLayout";
+import { VerifyEmailContent } from "@/app/(auth)/_components/verifyEmailContent";
 
 export const metadata: Metadata = {
   title: "Xác minh email",

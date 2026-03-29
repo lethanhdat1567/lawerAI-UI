@@ -1,10 +1,10 @@
 // src/app/(marketing)/hub/page.tsx
 import { Suspense } from "react";
 
-import { HubFiltersToolbar } from "@/app/(marketing)/hub/_components/hub-filters-toolbar";
-import { HubNewPostCta } from "@/app/(marketing)/hub/_components/hub-new-post-cta";
-import { HubPageLayout } from "@/app/(marketing)/hub/_components/hub-page-layout";
-import { HubPostGrid } from "@/app/(marketing)/hub/_components/hub-post-grid";
+import { HubFiltersToolbar } from "@/app/(marketing)/hub/_components/hubFiltersToolbar";
+import { HubNewPostCta } from "@/app/(marketing)/hub/_components/hubNewPostCta";
+import { HubPageLayout } from "@/app/(marketing)/hub/_components/hubPageLayout";
+import { HubPostGrid } from "@/app/(marketing)/hub/_components/hubPostGrid";
 
 function HubSkeleton() {
   return (
@@ -34,7 +34,7 @@ export default function HubPage() {
   return (
     <HubPageLayout
       title="Không gian thảo luận"
-      description="Đăng tình huống thực tế, nhận phản hồi cộng đồng và xem tóm tắt AI thư ký. Dữ liệu hiển thị là bản demo; sau này đồng bộ từ LawyerAI-api."
+      description="Đăng tình huống thực tế, nhận phản hồi cộng đồng và xem tóm tắt AI thư ký. Nội dung đồng bộ từ LawyerAI-api."
       action={<HubNewPostCta />}
     >
       <Suspense fallback={<HubSkeleton />}>

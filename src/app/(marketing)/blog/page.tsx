@@ -1,9 +1,9 @@
 // src/app/(marketing)/blog/page.tsx
 import { Suspense } from "react";
 
-import { BlogFiltersToolbar } from "@/app/(marketing)/blog/_components/blog-filters-toolbar";
-import { BlogPageLayout } from "@/app/(marketing)/blog/_components/blog-page-layout";
-import { BlogPostGrid } from "@/app/(marketing)/blog/_components/blog-post-grid";
+import { BlogFiltersToolbar } from "@/app/(marketing)/blog/_components/blogFiltersToolbar";
+import { BlogPageLayout } from "@/app/(marketing)/blog/_components/blogPageLayout";
+import { BlogPostGrid } from "@/app/(marketing)/blog/_components/blogPostGrid";
 
 function BlogSkeleton() {
   return (
@@ -31,9 +31,9 @@ function BlogSkeleton() {
 
 export default function BlogPage() {
   return (
-    <BlogPageLayout
+      <BlogPageLayout
       title="Blog & kiến thức"
-      description="Bài viết chuyên sâu; bài có nhãn Verified khi đối chiếu được CSDL pháp (minh họa UI — dữ liệu demo)."
+      description="Bài viết chuyên sâu; bài có nhãn Verified khi đã được kiểm chứng nội dung trên hệ thống."
     >
       <Suspense fallback={<BlogSkeleton />}>
         <BlogFiltersToolbar />
@@ -41,9 +41,6 @@ export default function BlogPage() {
           <BlogPostGrid />
         </div>
       </Suspense>
-      <p className="mt-8 text-center text-xs text-muted-foreground">
-        Dữ liệu demo — slug và thẻ bám schema BlogPost / Tag.
-      </p>
     </BlogPageLayout>
   );
 }

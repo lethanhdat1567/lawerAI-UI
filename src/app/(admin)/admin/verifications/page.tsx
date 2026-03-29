@@ -1,17 +1,14 @@
-// src/app/(admin)/admin/verifications/page.tsx
-import { AdminDataPlaceholder } from "@/components/admin/admin-data-placeholder";
-import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { AdminPageHeader } from "@/app/(admin)/admin/_components/adminPageHeader";
+import { AdminVerificationsManage } from "@/app/(admin)/admin/_components/adminVerificationsManage";
 
 export default function AdminVerificationsPage() {
   return (
     <div className="space-y-6">
       <AdminPageHeader
         title="Xác minh luật sư"
-        description="Hàng chờ LawyerVerification — PENDING, APPROVED, REJECTED, REVOKED."
+        description="LawyerVerification — duyệt / từ chối / thu hồi; cập nhật vai trò VERIFIED_LAWYER khi duyệt."
       />
-      <AdminDataPlaceholder
-        columns={["Người nộp", "Trạng thái", "Khu vực", "Số thẻ", "Ngày tạo", "Thao tác"]}
-      />
+      <AdminVerificationsManage />
     </div>
   );
 }

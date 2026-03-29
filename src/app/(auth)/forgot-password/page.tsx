@@ -1,8 +1,8 @@
 // src/app/(auth)/forgot-password/page.tsx
 import type { Metadata } from "next";
 
-import { AuthPageLayout } from "@/components/auth/auth-page-layout";
-import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
+import { AuthPageLayout } from "@/app/(auth)/_components/authPageLayout";
+import { ForgotPasswordForm } from "@/app/(auth)/_components/forgotPasswordForm";
 
 export const metadata: Metadata = {
   title: "Quên mật khẩu",

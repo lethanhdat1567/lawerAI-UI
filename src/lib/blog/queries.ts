@@ -16,6 +16,7 @@ function recordToListItem(p: (typeof mockBlogPosts)[0]): BlogPostListItem {
     id: p.id,
     slug: p.slug,
     title: p.title,
+    thumbnailUrl: p.thumbnailUrl ?? null,
     excerpt: p.excerpt,
     status: p.status,
     isVerified: p.isVerified,
@@ -23,6 +24,8 @@ function recordToListItem(p: (typeof mockBlogPosts)[0]): BlogPostListItem {
     author: getBlogAuthorById(p.authorId),
     createdAt: p.createdAt,
     updatedAt: p.updatedAt,
+    commentCount: p.commentCount ?? 0,
+    likeCount: p.likeCount ?? 0,
   };
 }
 
@@ -86,5 +89,7 @@ export function getBlogPostBySlug(slug: string): BlogPostDetail | null {
     verifiedAt: p.verifiedAt,
     verificationNotes: p.verificationNotes,
     legalCorpusVersion: p.legalCorpusVersion,
+    comments: p.comments ?? [],
+    savedCount: p.savedCount ?? 0,
   };
 }

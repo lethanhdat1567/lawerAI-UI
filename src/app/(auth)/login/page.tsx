@@ -1,8 +1,9 @@
 // src/app/(auth)/login/page.tsx
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
-import { AuthPageLayout } from "@/components/auth/auth-page-layout";
-import { LoginForm } from "@/components/auth/login-form";
+import { AuthPageLayout } from "@/app/(auth)/_components/authPageLayout";
+import { LoginForm } from "@/app/(auth)/_components/loginForm";
 
 export const metadata: Metadata = {
   title: "Đăng nhập",
@@ -15,7 +16,9 @@ export default function LoginPage() {
       title="Đăng nhập"
       description="Truy cập tài khoản để lưu hội thoại tra cứu và đóng góp trên Hub."
     >
-      <LoginForm />
+      <Suspense fallback={null}>
+        <LoginForm />
+      </Suspense>
     </AuthPageLayout>
   );
 }

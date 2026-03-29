@@ -6,14 +6,16 @@ import {
   mockCategories,
   mockPosts,
 } from "@/lib/hub/mock-data";
+import { buildCommentTree } from "@/lib/hub/buildCommentTree";
 import type {
-  HubCommentNode,
-  HubCommentUI,
+  HubCommentWithAuthor,
   HubOversightVersionUI,
   HubPostDetail,
   HubPostListItem,
   HubSortMode,
 } from "@/lib/hub/types";
+
+export { buildCommentTree };
 
 const EXCERPT_LEN = 180;
 
@@ -94,38 +96,16 @@ export function getPostBySlug(slug: string): HubPostDetail | null {
   const p = mockPosts.find((x) => x.slug === slug);
   if (!p || p.status !== "PUBLISHED") return null;
   const base = recordToListItem(p);
+  const comments: HubCommentWithAuthor[] = p.comments.map((c) => ({
+    ...c,
+    author: getAuthorById(c.authorId),
+  }));
   return {
     ...base,
     body: p.body,
-    comments: p.comments,
+    comments,
     oversightVersions: p.oversightVersions,
   };
-}
-
-export function buildCommentTree(comments: HubCommentUI[]): HubCommentNode[] {
-  const withAuthors: HubCommentNode[] = comments.map((c) => ({
-    ...c,
-    author: getAuthorById(c.authorId),
-    replies: [],
-  }));
-
-  const byId = new Map(withAuthors.map((c) => [c.id, c]));
-  const roots: HubCommentNode[] = [];
-
-  for (const c of withAuthors) {
-    if (c.parentId && byId.has(c.parentId)) {
-      byId.get(c.parentId)!.replies.push(c);
-    } else {
-      roots.push(c);
-    }
-  }
-
-  const sortNodes = (nodes: HubCommentNode[]) => {
-    nodes.sort((a, b) => a.createdAt.localeCompare(b.createdAt));
-    for (const n of nodes) sortNodes(n.replies);
-  };
-  sortNodes(roots);
-  return roots;
 }
 
 export function getCurrentOversight(

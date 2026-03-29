@@ -1,6 +1,6 @@
 // src/app/(marketing)/my/layout.tsx
-import { MyAuthGuard } from "@/app/(marketing)/my/_components/my-auth-guard";
-import { MyShell } from "@/app/(marketing)/my/_components/my-shell";
+import { MyAuthGuard } from "@/app/(marketing)/my/_components/myAuthGuard";
+import { MyShell } from "@/app/(marketing)/my/_components/myShell";
 
 export default function MyLayout({
   children,

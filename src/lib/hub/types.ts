@@ -35,10 +35,15 @@ export interface HubCommentUI {
   authorId: string;
   body: string;
   createdAt: string;
+  likeCount: number;
 }
 
-export interface HubCommentNode extends HubCommentUI {
+/** Bình luận từ API kèm tác giả (mock có thể bổ sung khi build cây). */
+export interface HubCommentWithAuthor extends HubCommentUI {
   author: HubAuthor;
+}
+
+export interface HubCommentNode extends HubCommentWithAuthor {
   replies: HubCommentNode[];
 }
 
@@ -71,7 +76,7 @@ export interface HubPostListItem {
 
 export interface HubPostDetail extends HubPostListItem {
   body: string;
-  comments: HubCommentUI[];
+  comments: HubCommentWithAuthor[];
   oversightVersions: HubOversightVersionUI[];
 }
 

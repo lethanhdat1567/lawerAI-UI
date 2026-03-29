@@ -1,6 +1,6 @@
 // src/app/(marketing)/layout.tsx
-import { SiteFooter } from "@/components/layout/site-footer";
-import { SiteHeader } from "@/components/layout/site-header";
+import { SiteFooter } from "@/components/layout/siteFooter";
+import { SiteHeader } from "@/components/layout/siteHeader";
 
 interface MarketingLayoutProps {
   children: React.ReactNode;

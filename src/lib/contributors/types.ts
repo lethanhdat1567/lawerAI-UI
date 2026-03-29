@@ -6,17 +6,21 @@ export type ContributorDemoRole = "VERIFIED_LAWYER" | null;
 export interface ContributorRow {
   rank: number;
   userId: string;
+  /** Rỗng khi contributorOptOut (API ẩn PII). */
   username: string;
   displayName: string | null;
   avatarUrl: string | null;
   score: number;
   contributorOptOut: boolean;
   role?: ContributorDemoRole;
+  tierCode?: string;
+  tierLabelVi?: string;
 }
 
 export type ReputationReasonKey =
   | "HUB_REPLY_HELPFUL"
   | "BLOG_QUALITY"
+  | "BLOG_COMMENT_HELPFUL"
   | "MOD_ADJUSTMENT"
   | "ADMIN_BONUS"
   | "ADMIN_PENALTY";

@@ -2,8 +2,8 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
-import { AuthPageLayout } from "@/components/auth/auth-page-layout";
-import { ResetPasswordForm } from "@/components/auth/reset-password-form";
+import { AuthPageLayout } from "@/app/(auth)/_components/authPageLayout";
+import { ResetPasswordForm } from "@/app/(auth)/_components/resetPasswordForm";
 
 export const metadata: Metadata = {
   title: "Đặt lại mật khẩu",

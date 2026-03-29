@@ -64,7 +64,7 @@ import { useWindowSize } from "@/hooks/use-window-size";
 import { useCursorVisibility } from "@/hooks/use-cursor-visibility";
 
 // --- Components ---
-import { ThemeToggle } from "@/components/tiptap-templates/simple/theme-toggle";
+import { ThemeToggle } from "@/components/tiptap-templates/simple/themeToggle";
 
 // --- Lib ---
 import { cn } from "@/lib/utils";

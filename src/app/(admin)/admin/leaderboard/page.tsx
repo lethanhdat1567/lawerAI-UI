@@ -1,15 +1,14 @@
-// src/app/(admin)/admin/leaderboard/page.tsx
-import { AdminDataPlaceholder } from "@/components/admin/admin-data-placeholder";
-import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { AdminPageHeader } from "@/app/(admin)/admin/_components/adminPageHeader";
+import { AdminLeaderboardManage } from "@/app/(admin)/admin/_components/adminLeaderboardManage";
 
 export default function AdminLeaderboardPage() {
   return (
     <div className="space-y-6">
       <AdminPageHeader
         title="Bảng xếp hạng"
-        description="LeaderboardSnapshot — payload JSON theo kỳ (đọc / xuất từ API)."
+        description="UserContributionScore — điểm đóng góp (admin xem kèm email)."
       />
-      <AdminDataPlaceholder columns={["Kỳ bắt đầu", "Kỳ kết thúc", "Tạo lúc", "Xem JSON"]} />
+      <AdminLeaderboardManage />
     </div>
   );
 }

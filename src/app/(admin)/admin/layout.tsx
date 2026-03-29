@@ -1,7 +1,7 @@
 // src/app/(admin)/admin/layout.tsx
 import type { Metadata } from "next";
 
-import { AdminLayoutShell } from "@/components/admin/admin-layout-shell";
+import { AdminLayoutShell } from "@/app/(admin)/admin/_components/adminLayoutShell";
 
 export const metadata: Metadata = {
   title: "Admin",

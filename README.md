@@ -24,3 +24,9 @@ Mở [http://localhost:3000](http://localhost:3000).
 ```bash
 npm run build
 ```
+
+## Biến môi trường (tùy chức năng)
+
+- **`NEXT_PUBLIC_API_BASE_URL`** — URL gốc API (ví dụ `http://localhost:8000`).
+- **`ALLOW_ADMIN_UI`** — Trên **production**, đặt `true` để bật route `/admin` (mặc định chặn). Development luôn cho phép URL admin (vẫn phải đăng nhập + cookie access hợp lệ).
+- **`JWT_ACCESS_SECRET`** hoặc **`JWT_SECRET`** — Dùng **trên server Next** (middleware) để verify cookie `lawyerai_at`; giá trị phải **trùng** `JWT_ACCESS_SECRET` / `JWT_SECRET` của LawerAI-api khi ký access token.

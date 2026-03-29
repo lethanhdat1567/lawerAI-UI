@@ -1,9 +1,21 @@
 // src/app/(marketing)/hub/new/page.tsx
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { ArrowLeftIcon } from "lucide-react";
 
-import { HubNewPostAuthGuard } from "@/app/(marketing)/hub/_components/hub-new-post-auth-guard";
-import { HubNewPostForm } from "@/app/(marketing)/hub/_components/hub-new-post-form";
+import { HubNewPostAuthGuard } from "@/app/(marketing)/hub/_components/hubNewPostAuthGuard";
+
+const HubNewPostFormLazy = dynamic(
+  () =>
+    import("@/app/(marketing)/hub/_components/hubNewPostForm").then((m) => ({
+      default: m.HubNewPostForm,
+    })),
+  {
+    loading: () => (
+      <p className="text-sm text-muted-foreground">Đang tải trình soạn…</p>
+    ),
+  },
+);
 
 export default function HubNewPostPage() {
   return (
@@ -25,7 +37,7 @@ export default function HubNewPostPage() {
       </header>
       <div className="mt-10">
         <HubNewPostAuthGuard>
-          <HubNewPostForm />
+          <HubNewPostFormLazy />
         </HubNewPostAuthGuard>
       </div>
     </div>
