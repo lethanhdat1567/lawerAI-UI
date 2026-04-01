@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ApiError } from "@/lib/api/errors";
 import { applyAuthResponse } from "@/lib/auth/applyAuthResponse";
-import { authService } from "@/services/authService";
+import { authService } from "@/services/auth/authService";
 
 function safeNextPath(raw: string | null): string | null {
   if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return null;

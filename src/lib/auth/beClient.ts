@@ -1,6 +1,6 @@
 import { getApiBaseUrl } from "@/lib/api/config";
 import type { ApiFailure, ApiSuccess } from "@/lib/api/types";
-import type { TokenPair } from "@/services/authTypes";
+import type { TokenPair } from "@/services/auth/authTypes";
 
 /** Server-side: gọi BE refresh (không qua cookie). */
 export async function beRefresh(refreshToken: string): Promise<TokenPair> {

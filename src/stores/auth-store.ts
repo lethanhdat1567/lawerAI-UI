@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-import type { PublicUser } from "@/services/authTypes";
+import type { PublicUser } from "@/services/auth/authTypes";
 
 const AUTH_STORAGE_KEY = "lawyerai-auth-v2";
 

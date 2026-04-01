@@ -9,7 +9,7 @@ import { isValidEmail } from "@/app/(auth)/_components/authValidation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ApiError } from "@/lib/api/errors";
-import { authService } from "@/services/authService";
+import { authService } from "@/services/auth/authService";
 
 export function ForgotPasswordForm() {
   const [error, setError] = useState("");

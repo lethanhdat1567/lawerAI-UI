@@ -28,7 +28,7 @@ import { resolvePublicImageUrl } from "@/lib/media/resolvePublicImageUrl";
 import { mainNavItems, siteName } from "@/lib/site-config";
 import { ThemeToggle } from "@/components/themeToggle";
 import { cn } from "@/lib/utils";
-import type { PublicUser } from "@/services/authTypes";
+import type { PublicUser } from "@/services/auth/authTypes";
 import { useAuthStore } from "@/stores/auth-store";
 import { useUiStore } from "@/stores/ui-store";
 

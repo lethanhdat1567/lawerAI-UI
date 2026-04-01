@@ -8,8 +8,8 @@ import { buttonVariants } from "@/components/ui/button";
 import { ApiError } from "@/lib/api/errors";
 import { applyAuthResponse } from "@/lib/auth/applyAuthResponse";
 import { cn } from "@/lib/utils";
-import { authService } from "@/services/authService";
-import { isVerifyEmailWithTokens } from "@/services/authTypes";
+import { authService } from "@/services/auth/authService";
+import { isVerifyEmailWithTokens } from "@/services/auth/authTypes";
 
 interface VerifyEmailContentProps {
   token: string | undefined;

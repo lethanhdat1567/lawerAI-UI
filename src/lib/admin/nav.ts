@@ -3,6 +3,7 @@
 import type { LucideIcon } from "lucide-react";
 import {
   Award,
+  Bot,
   BookOpen,
   FileText,
   Flag,
@@ -29,4 +30,5 @@ export const adminNavMain: AdminNavItem[] = [
   { title: "Uy tín", href: "/admin/reputation", icon: Award },
   { title: "Bảng xếp hạng", href: "/admin/leaderboard", icon: Trophy },
   { title: "Nguồn pháp lý", href: "/admin/legal-sources", icon: BookOpen },
+  { title: "Crawl", href: "/admin/crawl", icon: Bot },
 ];

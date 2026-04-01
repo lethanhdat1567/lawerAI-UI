@@ -16,7 +16,7 @@ import {
   registerFormSchema,
   type RegisterFormValues,
 } from "@/lib/validators/registerForm";
-import { authService } from "@/services/authService";
+import { authService } from "@/services/auth/authService";
 
 export function RegisterForm() {
   const [message, setMessage] = useState<{

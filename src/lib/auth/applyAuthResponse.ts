@@ -1,6 +1,6 @@
 import { persistSessionCookies } from "@/lib/session/persistSession";
 import { useAuthStore } from "@/stores/auth-store";
-import type { AuthTokensResponse } from "@/services/authTypes";
+import type { AuthTokensResponse } from "@/services/auth/authTypes";
 
 export async function applyAuthResponse(
   data: AuthTokensResponse,

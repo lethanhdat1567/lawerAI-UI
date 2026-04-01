@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/api/errors";
 import { resolveApiAssetUrl } from "@/lib/media/resolveApiAssetUrl";
 import { cn } from "@/lib/utils";
-import { authService } from "@/services/authService";
+import { authService } from "@/services/auth/authService";
 
 export function BlogThumbnailUploadField({
   id,

@@ -385,7 +385,7 @@ export const handleImageUpload = async (
     throw new Error("Upload cancelled");
   }
 
-  const { authService } = await import("@/services/authService");
+  const { authService } = await import("@/services/auth/authService");
   const { resolvePublicImageUrl } =
     await import("@/lib/media/resolvePublicImageUrl");
 

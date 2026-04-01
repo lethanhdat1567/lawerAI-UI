@@ -6,7 +6,7 @@ import type {
   RegisterResponse,
   TokenPair,
   VerifyEmailResult,
-} from "@/services/authTypes";
+} from "@/services/auth/authTypes";
 
 export type LoginBody = { email: string; password: string };
 

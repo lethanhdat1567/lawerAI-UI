@@ -17,8 +17,8 @@ import {
   type ProfileFormValues,
 } from "@/lib/validators/profileForm";
 import { cn } from "@/lib/utils";
-import { authService } from "@/services/authService";
-import type { PublicUser } from "@/services/authTypes";
+import { authService } from "@/services/auth/authService";
+import type { PublicUser } from "@/services/auth/authTypes";
 import { useAuthStore } from "@/stores/auth-store";
 
 function toFormDefaults(u: PublicUser): ProfileFormValues {

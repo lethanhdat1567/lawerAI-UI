@@ -40,6 +40,29 @@ alwaysApply: true
   - **Optimization:** Wrap client components in `Suspense` with a fallback; use dynamic loading for heavy components.
   - **Images:** Use WebP format, include explicit size data, and use `https://placekitten.com/` for placeholders.
 
+- API Communication & Service Layer (Mandatory)
+  - **Service-Based Architecture:** Every Backend interaction must go through a dedicated service object in `src/services/`.
+  - **Domain Folder Structure:** Organize services by domain using `src/services/<domain>/` (e.g. `src/services/auth/authService.ts`, `src/services/auth/authTypes.ts`).
+  - **No Direct Fetch:** Direct use of `fetch`, `axios`, or `apiRequest` inside Components or Stores is prohibited.
+  - **Standard Client:** Use the `apiRequest` wrapper from `@/lib/api/http.client`.
+  - **Type Integrity:**
+    - Every service file (e.g. `userService.ts`) must live beside its corresponding type file (e.g. `userTypes.ts`) inside the same domain folder.
+    - Use **Interfaces** for API Responses and **Literal Types** for Payloads.
+    - All methods must explicitly return `Promise<T>`.
+    - Keep API-specific contracts inside the service domain folder. Only move broadly shared app types to `src/lib/<domain>/types.ts` or `src/types/`.
+  - **Example Structure:**
+    ```typescript
+    // src/services/chat/chatService.ts
+    export const chatService = {
+      async sendMessage(body: SendMessageBody): Promise<MessageResponse> {
+        return apiRequest<MessageResponse>("/api/v1/chat", {
+          method: "POST",
+          body,
+        });
+      },
+    };
+    ```
+
 - Project Structure
   - Root: All application code must be under the `/src` directory.
   - `/src/app`: Application logic, routing, and page-specific `_components`.

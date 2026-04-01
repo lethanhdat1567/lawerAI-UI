@@ -1,153 +1,167 @@
 "use client";
 
-import Link from "next/link";
-import {
-  LogInIcon,
-  LogOutIcon,
-  PlusIcon,
-  SettingsIcon,
-  SparklesIcon,
-} from "lucide-react";
+import { MessageSquarePlus, Search, SidebarClose, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { displayTitle } from "@/lib/assistant/queries";
-import type { AssistantConversationListItem } from "@/lib/assistant/types";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { useAssistantSessionStore } from "@/stores/assistant-session-store";
 
-export interface AssistantSidebarContentProps {
-  conversations: AssistantConversationListItem[];
-  activeId: string | null;
-  onSelect: (id: string) => void;
-  onNewChat: () => void;
-  canInteract: boolean;
-  onNavigate?: () => void;
-}
+import { AssistantGuestNotice } from "./assistantGuestNotice";
+import { AssistantSidebarConversationSection } from "./assistantSidebarConversationSection";
+import { AssistantSidebarDeleteDialog } from "./assistantSidebarDeleteDialog";
+import { AssistantSidebarFooter } from "./assistantSidebarFooter";
+import type { AssistantSidebarProps } from "./assistantSidebar.types";
 
-export function AssistantSidebarContent({
+export function AssistantSidebar({
+  authMode,
   conversations,
-  activeId,
-  onSelect,
-  onNewChat,
-  canInteract,
-  onNavigate,
-}: AssistantSidebarContentProps) {
-  const isDemoLoggedIn = useAssistantSessionStore((s) => s.isDemoLoggedIn);
-  const setDemoLoggedIn = useAssistantSessionStore((s) => s.setDemoLoggedIn);
+  isCreatingConversation,
+  isHydrated,
+  isLoadingConversations,
+  isOpen,
+  onCreateConversation,
+  onDeleteConversation,
+  onRenameConversation,
+  processingConversationId,
+  searchValue,
+  selectedConversationId,
+  onSearchChange,
+  onSelectConversation,
+  sessionsError,
+  onToggleSidebar,
+}: AssistantSidebarProps) {
+  const isGuest = authMode === "guest";
+  const [editingConversationId, setEditingConversationId] = useState<string | null>(
+    null,
+  );
+  const [deleteConversationId, setDeleteConversationId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setEditingConversationId(null);
+      setDeleteConversationId(null);
+    }
+  }, [isOpen]);
+
+  const deleteConversation = conversations.find(
+    (conversation) => conversation.id === deleteConversationId,
+  );
 
   return (
-    <div className="flex h-full flex-col">
-      <div className="flex items-center gap-2 border-b border-border p-3">
-        <Button
-          type="button"
-          onClick={() => {
-            onNewChat();
-            onNavigate?.();
-          }}
-          className="h-10 flex-1 justify-start gap-2 rounded-none border border-border bg-secondary px-3 text-sm font-medium text-secondary-foreground hover:bg-muted"
-        >
-          <PlusIcon className="size-4 shrink-0" />
-          Cuộc trò chuyện mới
-        </Button>
-      </div>
-
-      <div className="flex items-center gap-2 border-b border-border px-3 py-2">
-        <SparklesIcon className="size-4 text-muted-foreground" aria-hidden />
-        <span className="text-xs font-medium text-muted-foreground">Nội dung của tôi</span>
-        <span className="ml-auto text-[10px] uppercase tracking-wide text-muted-foreground">
-          Sau
-        </span>
-      </div>
-
-      <div className="min-h-0 flex-1 overflow-y-auto px-2 py-3">
-        <p className="mb-2 px-2 text-xs font-medium text-muted-foreground">Cuộc trò chuyện</p>
-        {!canInteract ? (
-          <p className="px-2 text-sm leading-relaxed text-muted-foreground">
-            Tra cứu thử không cần đăng nhập.{" "}
-            <Link href="/register" className="text-primary hover:underline">
-              Đăng ký
-            </Link>{" "}
-            /{" "}
-            <Link href="/login" className="text-primary hover:underline">
-              Đăng nhập
-            </Link>{" "}
-            hoặc bật demo để lưu và xem danh sách lịch sử nhiều cuộc.
-          </p>
-        ) : conversations.length === 0 ? (
-          <p className="px-2 text-sm text-muted-foreground">Chưa có cuộc trò chuyện.</p>
-        ) : (
-          <ul className="space-y-1">
-            {conversations.map((c) => {
-              const active = c.id === activeId;
-              return (
-                <li key={c.id}>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      onSelect(c.id);
-                      onNavigate?.();
-                    }}
-                    className={cn(
-                      "w-full rounded-none px-3 py-2.5 text-left text-sm transition-colors",
-                      active
-                        ? "bg-primary/20 text-foreground"
-                        : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                    )}
-                  >
-                    <span className="line-clamp-2">{displayTitle(c)}</span>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
+    <>
+      <aside
+        className={cn(
+          "flex h-screen shrink-0 flex-col border-r border-black/5 bg-slate-50 transition-all duration-200 dark:border-white/10 dark:bg-[oklch(0.12_0.01_285)]",
+          isOpen ? "w-[296px]" : "w-0 overflow-hidden border-r-0",
         )}
-      </div>
+      >
+        <div className="flex items-center justify-between border-b border-black/5 px-4 py-3 dark:border-white/10">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 text-slate-900 dark:text-slate-100">
+              <Sparkles className="size-4" />
+              <p className="truncate text-sm font-semibold">LawerAI Assistant</p>
+            </div>
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+              Không gian hội thoại tối giản
+            </p>
+          </div>
 
-      <div className="border-t border-border p-3">
-        <Button
-          type="button"
-          variant="ghost"
-          disabled
-          className="mb-2 h-9 w-full justify-start gap-2 px-2 text-muted-foreground"
-        >
-          <SettingsIcon className="size-4" />
-          Cài đặt và trợ giúp
-        </Button>
-        <div className="rounded-none border border-border bg-muted/50 p-2">
-          <p className="mb-2 px-1 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
-            Chế độ demo
-          </p>
-          {isDemoLoggedIn ? (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="flex w-full items-center justify-center gap-2 border-border bg-transparent text-foreground"
-              onClick={() => setDemoLoggedIn(false)}
-            >
-              <LogOutIcon className="size-3.5" />
-              Đăng xuất demo
-            </Button>
-          ) : (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="flex w-full items-center justify-center gap-2 border-border bg-transparent text-foreground"
-              onClick={() => setDemoLoggedIn(true)}
-            >
-              <LogInIcon className="size-3.5" />
-              Đăng nhập demo
-            </Button>
-          )}
-          <Link
-            href="/login"
-            className="mt-2 block text-center text-xs text-primary hover:underline"
+          <Button
+            aria-label="Đóng sidebar"
+            className="rounded-none border border-transparent text-slate-500 hover:border-black/5 hover:bg-white hover:text-slate-900 dark:text-slate-400 dark:hover:border-white/10 dark:hover:bg-white/5 dark:hover:text-slate-100"
+            size="icon-sm"
+            variant="ghost"
+            onClick={onToggleSidebar}
           >
-            Đăng nhập thật
-          </Link>
+            <SidebarClose className="size-4" />
+          </Button>
         </div>
-      </div>
-    </div>
+
+        <div className="space-y-3 border-b border-black/5 px-4 py-3 dark:border-white/10">
+          <Button
+            className="h-10 w-full justify-start rounded-none border border-black/5 bg-white text-slate-900 shadow-none hover:bg-slate-100 dark:border-white/10 dark:bg-white/4 dark:text-slate-100 dark:hover:bg-white/8"
+            disabled={!isHydrated || isGuest || isCreatingConversation}
+            onClick={onCreateConversation}
+          >
+            <MessageSquarePlus className="size-4" />
+            {isCreatingConversation ? "Đang tạo hội thoại..." : "New Chat"}
+          </Button>
+
+          <div className="relative">
+            <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
+            <Input
+              disabled={!isHydrated || isGuest}
+              className="h-10 rounded-none border-black/5 bg-white pl-9 text-slate-700 placeholder:text-slate-400 dark:border-white/10 dark:bg-white/4 dark:text-slate-200 dark:placeholder:text-slate-500"
+              placeholder="Tìm kiếm cuộc hội thoại"
+              value={searchValue}
+              onChange={(event) => onSearchChange(event.target.value)}
+            />
+          </div>
+
+          {!isHydrated ? (
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Đang kiểm tra trạng thái đăng nhập...
+            </p>
+          ) : null}
+
+          {sessionsError ? (
+            <p className="text-xs text-red-500 dark:text-red-400">{sessionsError}</p>
+          ) : null}
+        </div>
+
+        <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3">
+          {isGuest ? (
+            <div className="mb-3">
+              <AssistantGuestNotice />
+            </div>
+          ) : null}
+
+          <div className="mb-3 flex items-center justify-between px-1">
+            <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">
+              Cuộc trò chuyện
+            </p>
+            <p className="text-xs text-slate-400 dark:text-slate-500">{conversations.length}</p>
+          </div>
+
+          <AssistantSidebarConversationSection
+            conversations={conversations}
+            deleteConversationId={deleteConversationId}
+            editingConversationId={editingConversationId}
+            isGuest={isGuest}
+            isHydrated={isHydrated}
+            isLoading={isHydrated && isLoadingConversations}
+            processingConversationId={processingConversationId}
+            selectedConversationId={selectedConversationId}
+            onCancelRename={() => setEditingConversationId(null)}
+            onConfirmDelete={setDeleteConversationId}
+            onRenameConversation={onRenameConversation}
+            onSelectConversation={onSelectConversation}
+            onStartRename={(conversationId) => {
+              setDeleteConversationId(null);
+              setEditingConversationId(conversationId);
+            }}
+          />
+        </div>
+
+        <AssistantSidebarFooter />
+      </aside>
+
+      <AssistantSidebarDeleteDialog
+        conversationTitle={deleteConversation?.title}
+        isOpen={deleteConversationId !== null}
+        onConfirm={() => {
+          if (deleteConversationId) {
+            onDeleteConversation(deleteConversationId);
+          }
+          setDeleteConversationId(null);
+        }}
+        onOpenChange={(open) => {
+          if (!open) {
+            setDeleteConversationId(null);
+          }
+        }}
+      />
+    </>
   );
 }

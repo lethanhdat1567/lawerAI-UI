@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
-import { authService } from "@/services/authService";
+import { authService } from "@/services/auth/authService";
 import { useAuthStore } from "@/stores/auth-store";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {

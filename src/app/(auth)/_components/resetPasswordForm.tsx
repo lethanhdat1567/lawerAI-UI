@@ -14,7 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ApiError } from "@/lib/api/errors";
-import { authService } from "@/services/authService";
+import { authService } from "@/services/auth/authService";
 
 export function ResetPasswordForm() {
   const searchParams = useSearchParams();

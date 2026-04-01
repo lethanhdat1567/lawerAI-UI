@@ -1,4 +1,4 @@
-import type { AuthTokensResponse } from "@/services/authTypes";
+import type { AuthTokensResponse } from "@/services/auth/authTypes";
 
 export async function persistSessionCookies(
   data: Pick<

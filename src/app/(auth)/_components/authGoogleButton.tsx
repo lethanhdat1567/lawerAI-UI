@@ -15,7 +15,7 @@ import {
   isFirebaseConfigured,
 } from "@/lib/firebase/client";
 import { cn } from "@/lib/utils";
-import { authService } from "@/services/authService";
+import { authService } from "@/services/auth/authService";
 
 function describeFirebaseAuthError(err: unknown): string | null {
   if (!(err instanceof FirebaseError)) return null;

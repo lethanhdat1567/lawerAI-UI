@@ -92,6 +92,98 @@ export type AdminLegalSourceRow = {
   updatedAt: string;
 };
 
+export type PipelineTaskType =
+  | "HTML_CLEANING"
+  | "CLASSIFICATION"
+  | "METADATA_EXTRACT"
+  | "EMBEDDING";
+
+export type AdminCrawlTaskOverride = {
+  modelName?: string;
+  promptName?: string;
+  promptContent?: string;
+};
+
+export type AdminCrawlDraftRequest = {
+  url: string;
+  overrides?: Partial<Record<PipelineTaskType, AdminCrawlTaskOverride>>;
+};
+
+export type AdminCrawlDraftMetadata = {
+  chapter?: string | null;
+  article?: string | null;
+  tags: string[];
+  summary?: string | null;
+};
+
+export type AdminCrawlLogRef = {
+  id: string;
+  url: string;
+  status: "SUCCESS" | "FAILED" | "NO_CHANGE";
+  startedAt?: string | null;
+  finishedAt?: string | null;
+};
+
+export type AdminCrawlTaskExecutionConfig = {
+  taskType: PipelineTaskType;
+  modelName: string;
+  promptId?: string;
+  promptName: string;
+  promptContent: string;
+  isActive: boolean;
+};
+
+export type AdminCrawlDraftResponse = {
+  url: string;
+  markdownDraft: string;
+  suggestedCategory: string | null;
+  metadata: AdminCrawlDraftMetadata;
+  pipeline: {
+    byTask: Partial<Record<PipelineTaskType, AdminCrawlTaskExecutionConfig>>;
+  };
+  crawlLog: AdminCrawlLogRef;
+};
+
+export type AdminCrawlApproveRequest = {
+  crawlLogId: string;
+  url: string;
+  markdownDraft: string;
+  category?: string | null;
+  metadata: AdminCrawlDraftMetadata;
+  desiredStatus?: "SUCCESS" | "FAILED";
+};
+
+export type AdminCrawlApproveResponse = {
+  approved: boolean;
+  crawlLog: AdminCrawlLogRef;
+  syncDryRun: {
+    target: "supabase";
+    note: string;
+    preview: {
+      url: string;
+      category: string | null;
+      markdownLength: number;
+      tagsCount: number;
+      processedAt: string;
+    };
+  };
+};
+
+export type AdminPipelineTaskConfig = {
+  taskType: PipelineTaskType;
+  modelName: string;
+  promptId?: string;
+  promptName: string;
+  promptContent: string;
+  isActive: boolean;
+};
+
+export type AdminPipelineConfigResponse = {
+  pipelineConfig: {
+    byTask: Partial<Record<PipelineTaskType, AdminPipelineTaskConfig>>;
+  };
+};
+
 export async function adminStats() {
   return apiRequest<{ stats: AdminStats }>("/api/v1/admin/stats");
 }
@@ -237,4 +329,22 @@ export async function adminDeleteLegalSource(id: string) {
     `/api/v1/admin/legal-sources/${encodeURIComponent(id)}`,
     { method: "DELETE" },
   );
+}
+
+export async function adminCrawlDraft(body: AdminCrawlDraftRequest) {
+  return apiRequest<AdminCrawlDraftResponse>("/api/v1/admin/crawl-draft", {
+    method: "POST",
+    body,
+  });
+}
+
+export async function adminCrawlApprove(body: AdminCrawlApproveRequest) {
+  return apiRequest<AdminCrawlApproveResponse>("/api/v1/admin/crawl-approve", {
+    method: "POST",
+    body,
+  });
+}
+
+export async function adminPipelineConfig() {
+  return apiRequest<AdminPipelineConfigResponse>("/api/v1/admin/pipeline-config");
 }
