@@ -11,7 +11,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
     <div className="relative flex min-h-screen flex-col bg-background">
       <div
         aria-hidden
-        className="pointer-events-none fixed inset-0 -z-10 xtract-grid [mask-image:linear-gradient(180deg,black_40%,transparent)]"
+        className="pointer-events-none fixed inset-0 -z-10 xtract-grid mask-[linear-gradient(180deg,black_40%,transparent)]"
       />
       <div
         aria-hidden

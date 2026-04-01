@@ -21,9 +21,8 @@ export type ReputationReasonKey =
   | "HUB_REPLY_HELPFUL"
   | "BLOG_QUALITY"
   | "BLOG_COMMENT_HELPFUL"
-  | "MOD_ADJUSTMENT"
-  | "ADMIN_BONUS"
-  | "ADMIN_PENALTY";
+  | "BLOG_POST_LIKED"
+  | "MOD_ADJUSTMENT";
 
 export interface ReputationReasonExplainer {
   code: ReputationReasonKey;

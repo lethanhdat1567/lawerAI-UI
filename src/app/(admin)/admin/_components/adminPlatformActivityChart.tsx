@@ -4,6 +4,10 @@
 import * as React from "react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
+import type {
+  AdminDashboardRange,
+  AdminDashboardTimeseriesPoint,
+} from "@/lib/admin/adminApi";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,68 +24,84 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 
-/** Minh họa — API timeseries admin có thể bổ sung sau. */
-const overviewChartData = [
-  { label: "4 T1", assistantMessages: 120, hubPosts: 42, blogPublished: 18 },
-  { label: "8 T1", assistantMessages: 132, hubPosts: 38, blogPublished: 21 },
-  { label: "12 T1", assistantMessages: 158, hubPosts: 51, blogPublished: 19 },
-  { label: "16 T1", assistantMessages: 141, hubPosts: 47, blogPublished: 24 },
-  { label: "20 T1", assistantMessages: 176, hubPosts: 55, blogPublished: 22 },
-  { label: "24 T1", assistantMessages: 168, hubPosts: 49, blogPublished: 26 },
-  { label: "28 T1", assistantMessages: 189, hubPosts: 61, blogPublished: 28 },
-  { label: "2 T2", assistantMessages: 201, hubPosts: 58, blogPublished: 31 },
-  { label: "8 T2", assistantMessages: 195, hubPosts: 63, blogPublished: 27 },
-  { label: "14 T2", assistantMessages: 218, hubPosts: 67, blogPublished: 33 },
-  { label: "20 T2", assistantMessages: 205, hubPosts: 64, blogPublished: 30 },
-  { label: "28 T3", assistantMessages: 232, hubPosts: 72, blogPublished: 36 },
-];
-
 const overviewChartConfig = {
-  assistantMessages: {
-    label: "AssistantMessage (tin nhắn tra cứu)",
+  chatMessages: {
+    label: "ChatMessage",
     color: "var(--chart-1)",
   },
+  hubComments: {
+    label: "HubComment",
+    color: "var(--chart-2)",
+  },
   hubPosts: {
-    label: "HubPost (bài Hub)",
+    label: "HubPost",
     color: "var(--chart-4)",
   },
   blogPublished: {
-    label: "BlogPost · PUBLISHED",
+    label: "BlogPost · Published",
     color: "var(--chart-5)",
   },
 } satisfies ChartConfig;
 
-export function AdminPlatformActivityChart() {
-  const [range, setRange] = React.useState<"3m" | "30d" | "7d">("3m");
+const RANGE_OPTIONS = [
+  { id: "3m" as const, label: "3 tháng" },
+  { id: "30d" as const, label: "30 ngày" },
+  { id: "7d" as const, label: "7 ngày" },
+] as const;
+
+function formatBucketLabel(value: string) {
+  const date = new Date(value);
+  return new Intl.DateTimeFormat("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+  }).format(date);
+}
+
+type AdminPlatformActivityChartProps = {
+  range: AdminDashboardRange;
+  timeseries: AdminDashboardTimeseriesPoint[];
+  loading?: boolean;
+  onRangeChange: (range: AdminDashboardRange) => void;
+};
+
+export function AdminPlatformActivityChart({
+  range,
+  timeseries,
+  loading = false,
+  onRangeChange,
+}: AdminPlatformActivityChartProps) {
+  const chartData = React.useMemo(
+    () =>
+      timeseries.map((item) => ({
+        ...item,
+        label: formatBucketLabel(item.bucketStart),
+      })),
+    [timeseries],
+  );
 
   return (
     <Card className="w-full">
       <CardHeader className="flex flex-col gap-4 space-y-0 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-1">
-          <CardTitle>Hoạt động nền tảng (mock)</CardTitle>
+          <CardTitle>Hoạt động nền tảng</CardTitle>
           <CardDescription>
-            Chuỗi minh hoạ theo{" "}
-            <span className="font-medium text-foreground/80">AssistantMessage</span>,{" "}
-            <span className="font-medium text-foreground/80">HubPost</span>,{" "}
-            <span className="font-medium text-foreground/80">BlogPost</span> — cửa sổ:{" "}
-            {range === "3m" ? "3 tháng" : range === "30d" ? "30 ngày" : "7 ngày"}.
+            Dữ liệu thật từ dashboard backend theo{" "}
+            <span className="font-medium text-foreground/80">chatMessages</span>,{" "}
+            <span className="font-medium text-foreground/80">hubPosts</span>,{" "}
+            <span className="font-medium text-foreground/80">hubComments</span>,{" "}
+            <span className="font-medium text-foreground/80">blogPublished</span>.
           </CardDescription>
         </div>
         <div className="flex shrink-0 rounded-none border border-border bg-muted/40 p-0.5">
-          {(
-            [
-              { id: "3m" as const, label: "3 tháng" },
-              { id: "30d" as const, label: "30 ngày" },
-              { id: "7d" as const, label: "7 ngày" },
-            ] as const
-          ).map((item) => (
+          {RANGE_OPTIONS.map((item) => (
             <Button
               key={item.id}
               type="button"
               variant={range === item.id ? "secondary" : "ghost"}
               size="xs"
               className={cn("rounded-none px-2.5", range === item.id && "shadow-sm")}
-              onClick={() => setRange(item.id)}
+              onClick={() => onRangeChange(item.id)}
+              disabled={loading}
             >
               {item.label}
             </Button>
@@ -96,7 +116,7 @@ export function AdminPlatformActivityChart() {
         >
           <AreaChart
             accessibilityLayer
-            data={overviewChartData}
+            data={chartData}
             margin={{ left: 8, right: 8, top: 12, bottom: 8 }}
           >
             <CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-border/60" />
@@ -116,27 +136,40 @@ export function AdminPlatformActivityChart() {
               tick={{ fill: "currentColor", fontSize: 11 }}
               className="text-muted-foreground"
             />
-            <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="line" />} />
+            <ChartTooltip
+              cursor={false}
+              content={<ChartTooltipContent indicator="line" />}
+            />
             <Area
               dataKey="blogPublished"
               type="monotone"
               fill="var(--color-blogPublished)"
-              fillOpacity={0.14}
-              stroke="transparent"
+              fillOpacity={0.12}
+              stroke="var(--color-blogPublished)"
+              strokeWidth={1.5}
+            />
+            <Area
+              dataKey="hubComments"
+              type="monotone"
+              fill="var(--color-hubComments)"
+              fillOpacity={0.08}
+              stroke="var(--color-hubComments)"
+              strokeWidth={1.5}
             />
             <Area
               dataKey="hubPosts"
               type="monotone"
               fill="var(--color-hubPosts)"
-              fillOpacity={0.2}
-              stroke="transparent"
+              fillOpacity={0.12}
+              stroke="var(--color-hubPosts)"
+              strokeWidth={1.5}
             />
             <Area
-              dataKey="assistantMessages"
+              dataKey="chatMessages"
               type="monotone"
-              stroke="var(--color-assistantMessages)"
+              stroke="var(--color-chatMessages)"
               strokeWidth={2}
-              fill="var(--color-assistantMessages)"
+              fill="var(--color-chatMessages)"
               fillOpacity={0.08}
             />
           </AreaChart>

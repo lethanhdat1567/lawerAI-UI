@@ -22,21 +22,15 @@ export const REPUTATION_REASON_EXPLAINERS: ReputationReasonExplainer[] = [
       "Điểm khi người khác thích bình luận của bạn dưới bài blog (không tính tự thích).",
   },
   {
+    code: "BLOG_POST_LIKED",
+    title: "Bài Blog được thích",
+    description:
+      "Điểm cộng thêm theo số lượt thích hợp lệ trên bài blog đã xuất bản của bạn.",
+  },
+  {
     code: "MOD_ADJUSTMENT",
     title: "Điều chỉnh kiểm duyệt",
     description:
       "Thay đổi điểm sau khi đội điều phối xem xét báo cáo hoặc vi phạm quy chế.",
-  },
-  {
-    code: "ADMIN_BONUS",
-    title: "Thưởng quản trị",
-    description:
-      "Ghi nhận đặc biệt từ quản trị (ví dụ báo lỗi nghiêm trọng, đóng góp xây dựng cộng đồng).",
-  },
-  {
-    code: "ADMIN_PENALTY",
-    title: "Trừ điểm quản trị",
-    description:
-      "Áp dụng khi có vi phạm nghiêm trọng hoặc hành vi gây hại nền tảng.",
   },
 ];

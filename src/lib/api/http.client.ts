@@ -12,6 +12,19 @@ export type ApiRequestOptions = Omit<RequestInit, "body"> & {
 
 let refreshMutex: Promise<boolean> | null = null;
 
+async function resolveAccessToken(): Promise<string | null> {
+  if (typeof window !== "undefined") {
+    return useAuthStore.getState().accessToken;
+  }
+
+  const [{ cookies }, { COOKIE_ACCESS }] = await Promise.all([
+    import("next/headers"),
+    import("@/lib/auth/cookieNames"),
+  ]);
+  const jar = await cookies();
+  return jar.get(COOKIE_ACCESS)?.value ?? null;
+}
+
 async function runClientRefresh(): Promise<boolean> {
   try {
     const r = await fetch("/api/auth/refresh", {
@@ -110,7 +123,9 @@ export async function apiRequest<T>(
     headers.set("Content-Type", "application/json");
   }
 
-  const token = useAuthStore.getState().accessToken;
+  const token = headers.has("Authorization")
+    ? null
+    : await resolveAccessToken();
   if (token) {
     headers.set("Authorization", `Bearer ${token}`);
   }
@@ -139,15 +154,13 @@ export async function apiRequest<T>(
     const ok = await tryRefreshSession();
     if (ok) {
       const h2 = new Headers(initHeaders);
-      if (
-        body !== undefined &&
-        body !== null &&
-        !(body instanceof FormData)
-      ) {
+      if (body !== undefined && body !== null && !(body instanceof FormData)) {
         h2.set("Content-Type", "application/json");
       }
       const t2 = useAuthStore.getState().accessToken;
-      if (t2) h2.set("Authorization", `Bearer ${t2}`);
+      if (t2 && !h2.has("Authorization")) {
+        h2.set("Authorization", `Bearer ${t2}`);
+      }
       res = await fetch(url, {
         ...init,
         headers: h2,

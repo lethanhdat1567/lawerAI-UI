@@ -4,15 +4,19 @@
 import type { LucideIcon } from "lucide-react";
 import {
   BadgeCheckIcon,
-  FlagIcon,
+  BotMessageSquareIcon,
   LayoutListIcon,
   MessagesSquareIcon,
-  Sparkles,
+  ShieldCheckIcon,
   UsersIcon,
+  UserRoundCheckIcon,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import type { AdminStats } from "@/lib/admin/adminApi";
+import type {
+  AdminDashboardSnapshot,
+  AdminStats,
+} from "@/lib/admin/adminApi";
 import {
   Card,
   CardContent,
@@ -29,58 +33,106 @@ export interface AdminDashboardMetricItem {
   icon: LucideIcon;
 }
 
-export function buildAdminMetricItemsFromStats(
-  stats: AdminStats,
+export function buildAdminMetricItemsFromSnapshot(
+  snapshot: AdminDashboardSnapshot,
   formatInt: (n: number) => string,
 ): AdminDashboardMetricItem[] {
   return [
     {
       title: "User · tổng tài khoản",
       hint: "bảng users (active)",
-      value: formatInt(stats.usersTotal),
+      value: formatInt(snapshot.usersTotal),
+      delta: `${formatInt(snapshot.usersEmailVerifiedTotal)} email đã xác thực`,
+      positive: true,
+      icon: UsersIcon,
+    },
+    {
+      title: "User mới · 7 ngày",
+      hint: "tăng trưởng gần đây",
+      value: formatInt(snapshot.usersNew7d),
+      delta: "Cửa sổ 7 ngày gần nhất",
+      positive: true,
+      icon: UserRoundCheckIcon,
+    },
+    {
+      title: "LawyerVerification · PENDING",
+      hint: "hồ sơ chờ duyệt",
+      value: formatInt(snapshot.lawyerVerificationsPending),
+      delta: `${formatInt(snapshot.lawyerVerificationsApproved)} hồ sơ đã duyệt`,
+      positive: snapshot.lawyerVerificationsPending === 0,
+      icon: BadgeCheckIcon,
+    },
+    {
+      title: "BlogPost · PUBLISHED",
+      hint: "đã xuất bản",
+      value: formatInt(snapshot.blogPostsPublished),
+      delta: `${formatInt(snapshot.blogPostsPublishedUnverified)} bài chưa verify`,
+      positive: snapshot.blogPostsPublishedUnverified === 0,
+      icon: LayoutListIcon,
+    },
+    {
+      title: "Contributors",
+      hint: "score > 0",
+      value: formatInt(snapshot.contributorsActiveTotal),
       delta: "Số liệu thời gian thực",
+      positive: true,
+      icon: ShieldCheckIcon,
+    },
+    {
+      title: "Chat",
+      hint: "chat_messages / chat_sessions",
+      value: `${formatInt(snapshot.chatMessagesTotal)} · ${formatInt(snapshot.chatSessionsTotal)}`,
+      delta: "Tin nhắn · Phiên chat",
+      positive: true,
+      icon: BotMessageSquareIcon,
+    },
+    {
+      title: "Hub — bài & bình luận",
+      hint: "hub_posts + hub_comments",
+      value: `${formatInt(snapshot.hubPostsTotal)} · ${formatInt(snapshot.hubCommentsTotal)}`,
+      delta: "Bài · Bình luận",
+      positive: true,
+      icon: MessagesSquareIcon,
+    },
+  ];
+}
+
+export function buildAdminMetricItemsFromLegacyStats(
+  stats: AdminStats,
+  formatInt: (n: number) => string,
+): AdminDashboardMetricItem[] {
+  return [
+    {
+      title: "User · tổng tài khoản",
+      hint: "fallback từ payload cũ",
+      value: formatInt(stats.usersTotal),
+      delta: "Dữ liệu tương thích ngược",
       positive: true,
       icon: UsersIcon,
     },
     {
       title: "LawyerVerification · PENDING",
-      hint: "hồ sơ chờ duyệt",
+      hint: "fallback từ payload cũ",
       value: formatInt(stats.lawyerVerificationsPending),
-      delta: "Số liệu thời gian thực",
+      delta: "Dữ liệu tương thích ngược",
       positive: stats.lawyerVerificationsPending === 0,
       icon: BadgeCheckIcon,
     },
     {
       title: "Hub — bài & bình luận",
-      hint: "hub_posts + hub_comments",
+      hint: "fallback từ payload cũ",
       value: `${formatInt(stats.hubPostsTotal)} · ${formatInt(stats.hubCommentsTotal)}`,
       delta: "Bài · Bình luận",
       positive: true,
       icon: MessagesSquareIcon,
     },
     {
-      title: "Report · OPEN",
-      hint: "báo cáo chưa xử lý",
-      value: formatInt(stats.reportsOpen),
-      delta: "Số liệu thời gian thực",
-      positive: stats.reportsOpen === 0,
-      icon: FlagIcon,
-    },
-    {
       title: "BlogPost · PUBLISHED",
-      hint: "bài blog đã xuất bản",
+      hint: "fallback từ payload cũ",
       value: formatInt(stats.blogPostsPublished),
-      delta: "Số liệu thời gian thực",
+      delta: "Dữ liệu tương thích ngược",
       positive: true,
       icon: LayoutListIcon,
-    },
-    {
-      title: "AssistantMessage",
-      hint: "tin nhắn tra cứu (tổng)",
-      value: formatInt(stats.assistantMessagesTotal),
-      delta: "Số liệu thời gian thực",
-      positive: true,
-      icon: Sparkles,
     },
   ];
 }

@@ -3,11 +3,63 @@ import { apiRequest } from "@/lib/api/http.client";
 export type AdminStats = {
   usersTotal: number;
   lawyerVerificationsPending: number;
-  reportsOpen: number;
   hubPostsTotal: number;
   hubCommentsTotal: number;
   blogPostsPublished: number;
   assistantMessagesTotal: number;
+};
+
+export type AdminDashboardRange = "7d" | "30d" | "3m";
+
+export type AdminDashboardGranularity = "day";
+
+export type AdminDashboardSnapshot = {
+  usersTotal: number;
+  usersNew7d: number;
+  usersEmailVerifiedTotal: number;
+  lawyerVerificationsPending: number;
+  lawyerVerificationsApproved: number;
+  blogPostsPublished: number;
+  blogPostsPublishedUnverified: number;
+  hubPostsTotal: number;
+  hubCommentsTotal: number;
+  contributorsActiveTotal: number;
+  chatMessagesTotal: number;
+  chatSessionsTotal: number;
+  legacyAssistantMessagesTotal: number;
+};
+
+export type AdminDashboardQueues = {
+  lawyerVerificationsPending: number;
+  blogPostsPublishedUnverified: number;
+  usersNew7d: number;
+};
+
+export type AdminDashboardTimeseriesPoint = {
+  bucketStart: string;
+  usersNew: number;
+  hubPosts: number;
+  hubComments: number;
+  blogPublished: number;
+  chatMessages: number;
+};
+
+export type AdminDashboardData = {
+  range: AdminDashboardRange;
+  granularity: AdminDashboardGranularity;
+  metricSources: {
+    legacyStatsChatTotal: "assistant_messages";
+    dashboardChatTotal: "chat_messages";
+    chartChatActivity: "chat_messages";
+  };
+  snapshot: AdminDashboardSnapshot;
+  queues: AdminDashboardQueues;
+  timeseries: AdminDashboardTimeseriesPoint[];
+};
+
+export type AdminStatsResponse = {
+  stats: AdminStats;
+  dashboard?: AdminDashboardData;
 };
 
 export type AdminUserRow = {
@@ -45,29 +97,6 @@ export type AdminLawyerVerificationRow = {
   reviewedBy: { email: string; username: string | null } | null;
 };
 
-export type AdminReportRow = {
-  id: string;
-  reporterId: string;
-  targetType: string;
-  targetId: string;
-  reason: string;
-  status: string;
-  handledByUserId: string | null;
-  createdAt: string;
-  updatedAt: string;
-  reporter: {
-    id: string;
-    email: string;
-    username: string | null;
-    displayName: string | null;
-  };
-  handledBy: {
-    id: string;
-    email: string;
-    username: string | null;
-  } | null;
-};
-
 export type AdminLeaderboardRow = {
   rank: number;
   userId: string;
@@ -79,17 +108,6 @@ export type AdminLeaderboardRow = {
   userRole: string;
   tierCode: string;
   tierLabelVi: string;
-};
-
-export type AdminLegalSourceRow = {
-  id: string;
-  title: string;
-  sourceUrl: string | null;
-  jurisdiction: string | null;
-  effectiveFrom: string | null;
-  effectiveTo: string | null;
-  createdAt: string;
-  updatedAt: string;
 };
 
 export type PipelineTaskType =
@@ -105,8 +123,7 @@ export type AdminCrawlTaskOverride = {
 };
 
 export type AdminCrawlDraftRequest = {
-  url: string;
-  overrides?: Partial<Record<PipelineTaskType, AdminCrawlTaskOverride>>;
+  page_url: string;
 };
 
 export type AdminCrawlDraftMetadata = {
@@ -131,17 +148,6 @@ export type AdminCrawlTaskExecutionConfig = {
   promptName: string;
   promptContent: string;
   isActive: boolean;
-};
-
-export type AdminCrawlDraftResponse = {
-  url: string;
-  markdownDraft: string;
-  suggestedCategory: string | null;
-  metadata: AdminCrawlDraftMetadata;
-  pipeline: {
-    byTask: Partial<Record<PipelineTaskType, AdminCrawlTaskExecutionConfig>>;
-  };
-  crawlLog: AdminCrawlLogRef;
 };
 
 export type AdminCrawlApproveRequest = {
@@ -184,8 +190,17 @@ export type AdminPipelineConfigResponse = {
   };
 };
 
-export async function adminStats() {
-  return apiRequest<{ stats: AdminStats }>("/api/v1/admin/stats");
+export async function adminStats(params?: {
+  range?: AdminDashboardRange;
+  granularity?: AdminDashboardGranularity;
+}) {
+  const sp = new URLSearchParams();
+  if (params?.range) sp.set("range", params.range);
+  if (params?.granularity) sp.set("granularity", params.granularity);
+  const query = sp.toString();
+  return apiRequest<AdminStatsResponse>(
+    query ? `/api/v1/admin/stats?${query}` : "/api/v1/admin/stats",
+  );
 }
 
 export async function adminUsersList(params: {
@@ -208,10 +223,13 @@ export async function adminUsersList(params: {
 }
 
 export async function adminPatchUser(userId: string, role: UserRoleCode) {
-  return apiRequest<{ user: AdminUserRow }>(`/api/v1/admin/users/${encodeURIComponent(userId)}`, {
-    method: "PATCH",
-    body: { role },
-  });
+  return apiRequest<{ user: AdminUserRow }>(
+    `/api/v1/admin/users/${encodeURIComponent(userId)}`,
+    {
+      method: "PATCH",
+      body: { role },
+    },
+  );
 }
 
 export async function adminLawyerVerificationsList(params: {
@@ -241,34 +259,10 @@ export async function adminPatchLawyerVerification(
   );
 }
 
-export async function adminReportsList(params: {
-  page?: number;
-  pageSize?: number;
-  status?: string;
+export async function adminLeaderboard(params: {
+  limit?: number;
+  offset?: number;
 }) {
-  const sp = new URLSearchParams();
-  sp.set("page", String(params.page ?? 1));
-  sp.set("pageSize", String(params.pageSize ?? 20));
-  if (params.status) sp.set("status", params.status);
-  return apiRequest<{
-    items: AdminReportRow[];
-    total: number;
-    page: number;
-    pageSize: number;
-  }>(`/api/v1/admin/reports?${sp.toString()}`);
-}
-
-export async function adminPatchReport(
-  id: string,
-  body: { status: "ACTIONED" | "DISMISSED" },
-) {
-  return apiRequest<{ report: unknown }>(
-    `/api/v1/admin/reports/${encodeURIComponent(id)}`,
-    { method: "PATCH", body },
-  );
-}
-
-export async function adminLeaderboard(params: { limit?: number; offset?: number }) {
   const sp = new URLSearchParams();
   sp.set("limit", String(params.limit ?? 100));
   sp.set("offset", String(params.offset ?? 0));
@@ -278,73 +272,9 @@ export async function adminLeaderboard(params: { limit?: number; offset?: number
   }>(`/api/v1/admin/leaderboard?${sp.toString()}`);
 }
 
-export async function adminLegalSourcesList(params: {
-  page?: number;
-  pageSize?: number;
-  q?: string;
-}) {
-  const sp = new URLSearchParams();
-  sp.set("page", String(params.page ?? 1));
-  sp.set("pageSize", String(params.pageSize ?? 20));
-  if (params.q?.trim()) sp.set("q", params.q.trim());
-  return apiRequest<{
-    items: AdminLegalSourceRow[];
-    total: number;
-    page: number;
-    pageSize: number;
-  }>(`/api/v1/admin/legal-sources?${sp.toString()}`);
-}
-
-export async function adminCreateLegalSource(body: {
-  title: string;
-  sourceUrl?: string | null;
-  jurisdiction?: string | null;
-  effectiveFrom?: string | null;
-  effectiveTo?: string | null;
-}) {
-  return apiRequest<{ source: AdminLegalSourceRow }>(
-    "/api/v1/admin/legal-sources",
-    { method: "POST", body },
-  );
-}
-
-export async function adminPatchLegalSource(
-  id: string,
-  body: {
-    title?: string;
-    sourceUrl?: string | null;
-    jurisdiction?: string | null;
-    effectiveFrom?: string | null;
-    effectiveTo?: string | null;
-  },
-) {
-  return apiRequest<{ source: AdminLegalSourceRow }>(
-    `/api/v1/admin/legal-sources/${encodeURIComponent(id)}`,
-    { method: "PATCH", body },
-  );
-}
-
-export async function adminDeleteLegalSource(id: string) {
-  return apiRequest<{ ok: boolean }>(
-    `/api/v1/admin/legal-sources/${encodeURIComponent(id)}`,
-    { method: "DELETE" },
-  );
-}
-
 export async function adminCrawlDraft(body: AdminCrawlDraftRequest) {
-  return apiRequest<AdminCrawlDraftResponse>("/api/v1/admin/crawl-draft", {
+  return apiRequest("/api/v1/admin/crawl", {
     method: "POST",
     body,
   });
-}
-
-export async function adminCrawlApprove(body: AdminCrawlApproveRequest) {
-  return apiRequest<AdminCrawlApproveResponse>("/api/v1/admin/crawl-approve", {
-    method: "POST",
-    body,
-  });
-}
-
-export async function adminPipelineConfig() {
-  return apiRequest<AdminPipelineConfigResponse>("/api/v1/admin/pipeline-config");
 }
