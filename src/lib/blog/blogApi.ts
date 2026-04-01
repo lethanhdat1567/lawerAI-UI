@@ -4,14 +4,7 @@ import type {
   BlogPostDetail,
   BlogPostListItem,
   BlogSortMode,
-  BlogTag,
 } from "@/lib/blog/types";
-
-export async function blogPublicTags() {
-  return apiRequest<{ tags: BlogTag[] }>("/api/v1/blog/tags", {
-    skipRefreshRetry: true,
-  });
-}
 
 export async function blogPublicPosts(params: {
   q?: string;
@@ -254,13 +247,26 @@ export async function blogAdminPatchPost(
     slug: string | null;
     authorId: string;
     tagIds: string[];
-    isVerified: boolean;
-    verificationNotes: string | null;
-    legalCorpusVersion: string | null;
   }>,
 ) {
   return apiRequest<{ post: BlogPostListItem }>(
     `/api/v1/admin/blog/posts/${id}`,
+    {
+      method: "PATCH",
+      body,
+    },
+  );
+}
+
+export async function blogAdminPatchPostVerification(
+  id: string,
+  body: {
+    isVerified: boolean;
+    verificationNotes?: string | null;
+  },
+) {
+  return apiRequest<{ post: BlogPostDetail }>(
+    `/api/v1/admin/blog/posts/${id}/verification`,
     {
       method: "PATCH",
       body,

@@ -203,14 +203,6 @@ export function AdminVerificationsManage() {
                 <span className="text-muted-foreground">Firm:</span>{" "}
                 {detail.firmName ?? "—"}
               </p>
-              <div>
-                <span className="text-muted-foreground">Evidence (JSON):</span>
-                <pre className="mt-1 max-h-40 overflow-auto rounded border bg-muted/50 p-2 text-xs">
-                  {detail.evidenceJson != null
-                    ? JSON.stringify(detail.evidenceJson, null, 2)
-                    : "—"}
-                </pre>
-              </div>
               <div className="space-y-1">
                 <label htmlFor="ver-note" className="text-xs text-muted-foreground">
                   Ghi chú (tùy chọn)

@@ -12,10 +12,10 @@ import { RichContentPreview } from "@/components/rich-text-editor/richContentPre
 import { RichTextEditor } from "@/components/rich-text-editor/richTextEditor";
 import { ApiError } from "@/lib/api/errors";
 import { isHtmlContentEffectivelyEmpty } from "@/lib/editor/plain-excerpt";
+import { hubPublicCategories } from "@/lib/hub/hubCategoryApi";
 import {
   hubMePatchPost,
   hubMePostById,
-  hubPublicCategories,
 } from "@/lib/hub/hubApi";
 import type { HubCategoryUI, HubPostStatusUI } from "@/lib/hub/types";
 

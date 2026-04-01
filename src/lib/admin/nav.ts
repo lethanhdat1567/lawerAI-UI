@@ -10,6 +10,7 @@ import {
   LayoutDashboard,
   MessagesSquare,
   Scale,
+  Tags,
   Trophy,
   Users,
 } from "lucide-react";
@@ -26,7 +27,9 @@ export const adminNavMain: AdminNavItem[] = [
   { title: "Xác minh luật sư", href: "/admin/verifications", icon: Scale },
   { title: "Báo cáo", href: "/admin/reports", icon: Flag },
   { title: "Hub", href: "/admin/hub", icon: MessagesSquare },
+  { title: "Hub Categories", href: "/admin/hub-categories", icon: Tags },
   { title: "Blog", href: "/admin/blog", icon: FileText },
+  { title: "Blog Tags", href: "/admin/blog-tags", icon: Tags },
   { title: "Uy tín", href: "/admin/reputation", icon: Award },
   { title: "Bảng xếp hạng", href: "/admin/leaderboard", icon: Trophy },
   { title: "Nguồn pháp lý", href: "/admin/legal-sources", icon: BookOpen },

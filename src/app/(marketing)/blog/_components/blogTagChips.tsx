@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useQueryState } from "nuqs";
 import { parseAsString } from "nuqs";
 
-import { blogPublicTags } from "@/lib/blog/blogApi";
+import { blogPublicTags } from "@/lib/blog/blogTagApi";
 import type { BlogTag } from "@/lib/blog/types";
 import { cn } from "@/lib/utils";
 

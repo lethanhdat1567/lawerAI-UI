@@ -9,6 +9,7 @@ export type PublicProfile = {
   displayName: string | null;
   avatarUrl: string | null;
   bio: string | null;
+  role: string;
 };
 
 export async function fetchPublicProfileByUsername(

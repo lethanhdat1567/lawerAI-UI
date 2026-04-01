@@ -32,13 +32,13 @@ import {
 import { Pagination } from "@/components/pagination/pagination";
 import { ApiError } from "@/lib/api/errors";
 import { isHtmlContentEffectivelyEmpty } from "@/lib/editor/plain-excerpt";
+import { hubPublicCategories } from "@/lib/hub/hubCategoryApi";
 import {
   hubAdminCreatePost,
   hubAdminDeletePost,
   hubAdminPatchPost,
   hubAdminPostById,
   hubAdminPosts,
-  hubPublicCategories,
 } from "@/lib/hub/hubApi";
 import type { HubCategoryUI, HubPostListItem } from "@/lib/hub/types";
 

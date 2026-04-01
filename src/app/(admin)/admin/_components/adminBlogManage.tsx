@@ -13,6 +13,16 @@ import { toast } from "sonner";
 
 import { BlogThumbnailUploadField } from "@/app/(marketing)/blog/_components/blogThumbnailUploadField";
 import { RichTextEditor } from "@/components/rich-text-editor/richTextEditor";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,11 +48,17 @@ import {
   blogAdminCreatePost,
   blogAdminDeletePost,
   blogAdminPatchPost,
+  blogAdminPatchPostVerification,
   blogAdminPostById,
   blogAdminPosts,
-  blogPublicTags,
 } from "@/lib/blog/blogApi";
-import type { BlogPostListItem, BlogPostStatusUI, BlogTag } from "@/lib/blog/types";
+import { blogPublicTags } from "@/lib/blog/blogTagApi";
+import type {
+  BlogPostDetail,
+  BlogPostListItem,
+  BlogPostStatusUI,
+  BlogTag,
+} from "@/lib/blog/types";
 
 const PAGE_SIZE = 12;
 
@@ -83,10 +99,14 @@ export function AdminBlogManage() {
     useState<BlogPostListItem["status"]>("PUBLISHED");
   const [editAuthorId, setEditAuthorId] = useState("");
   const [editTagIds, setEditTagIds] = useState<Set<string>>(new Set());
-  const [editIsVerified, setEditIsVerified] = useState(false);
-  const [editVerificationNotes, setEditVerificationNotes] = useState("");
-  const [editLegalCorpusVersion, setEditLegalCorpusVersion] = useState("");
   const [saving, setSaving] = useState(false);
+  const [verificationOpen, setVerificationOpen] = useState(false);
+  const [verificationTarget, setVerificationTarget] = useState<BlogPostListItem | null>(
+    null,
+  );
+  const [verificationNotes, setVerificationNotes] = useState("");
+  const [verificationLoading, setVerificationLoading] = useState(false);
+  const [verificationSaving, setVerificationSaving] = useState(false);
   const [createAuthorId, setCreateAuthorId] = useState("");
   const [createTitle, setCreateTitle] = useState("");
   const [createBody, setCreateBody] = useState("");
@@ -153,6 +173,30 @@ export function AdminBlogManage() {
     };
   }, []);
 
+  function syncRowFromDetail(post: BlogPostDetail) {
+    setItems((prev) =>
+      prev.map((item) =>
+        item.id === post.id
+          ? {
+              id: post.id,
+              slug: post.slug,
+              title: post.title,
+              thumbnailUrl: post.thumbnailUrl,
+              excerpt: post.excerpt,
+              status: post.status,
+              isVerified: post.isVerified,
+              tags: post.tags,
+              author: post.author,
+              createdAt: post.createdAt,
+              updatedAt: post.updatedAt,
+              commentCount: post.commentCount,
+              likeCount: post.likeCount,
+            }
+          : item,
+      ),
+    );
+  }
+
   function openEdit(row: BlogPostListItem) {
     setEditing(row);
     setEditSlug(row.slug);
@@ -163,22 +207,37 @@ export function AdminBlogManage() {
     setEditStatus(row.status);
     setEditTagIds(new Set(row.tags.map((t) => t.id)));
     setEditBody("");
-    setEditIsVerified(row.isVerified);
-    setEditVerificationNotes("");
-    setEditLegalCorpusVersion("");
     setSheetOpen(true);
     void (async () => {
       try {
         const { post } = await blogAdminPostById(row.id);
         setEditBody(post.body);
         setEditThumbnailUrl(post.thumbnailUrl ?? "");
-        setEditVerificationNotes(post.verificationNotes ?? "");
-        setEditLegalCorpusVersion(post.legalCorpusVersion ?? "");
-        setEditIsVerified(post.isVerified);
       } catch {
         toast.error("Không tải chi tiết bài.");
         setSheetOpen(false);
         setEditing(null);
+      }
+    })();
+  }
+
+  function openVerification(row: BlogPostListItem) {
+    setVerificationTarget(row);
+    setVerificationNotes("");
+    setVerificationLoading(true);
+    setVerificationOpen(true);
+    void (async () => {
+      try {
+        const { post } = await blogAdminPostById(row.id);
+        setVerificationNotes(post.verificationNotes ?? "");
+      } catch (e) {
+        toast.error(
+          e instanceof ApiError ? e.message : "Không tải dữ liệu kiểm chứng.",
+        );
+        setVerificationOpen(false);
+        setVerificationTarget(null);
+      } finally {
+        setVerificationLoading(false);
       }
     })();
   }
@@ -204,13 +263,6 @@ export function AdminBlogManage() {
         status: editStatus,
         authorId: editAuthorId.trim(),
         tagIds: [...editTagIds],
-        isVerified: editIsVerified,
-        verificationNotes: editVerificationNotes.trim()
-          ? editVerificationNotes.trim()
-          : null,
-        legalCorpusVersion: editLegalCorpusVersion.trim()
-          ? editLegalCorpusVersion.trim()
-          : null,
       });
       toast.success("Đã cập nhật.");
       setItems((prev) => prev.map((x) => (x.id === post.id ? post : x)));
@@ -221,6 +273,33 @@ export function AdminBlogManage() {
       toast.error(e instanceof ApiError ? e.message : "Lưu thất bại.");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function submitVerification(nextVerified: boolean) {
+    if (!verificationTarget) return;
+    setVerificationSaving(true);
+    try {
+      const { post } = await blogAdminPatchPostVerification(verificationTarget.id, {
+        isVerified: nextVerified,
+        verificationNotes: nextVerified
+          ? verificationNotes.trim() || null
+          : null,
+      });
+      syncRowFromDetail(post);
+      if (editing?.id === post.id) {
+        setEditing((prev) => (prev ? { ...prev, isVerified: post.isVerified } : prev));
+      }
+      toast.success(nextVerified ? "Đã verify bài viết." : "Đã hủy verify bài viết.");
+      setVerificationOpen(false);
+      setVerificationTarget(null);
+      if (!nextVerified) {
+        setVerificationNotes("");
+      }
+    } catch (e) {
+      toast.error(e instanceof ApiError ? e.message : "Cập nhật verify thất bại.");
+    } finally {
+      setVerificationSaving(false);
     }
   }
 
@@ -424,6 +503,14 @@ export function AdminBlogManage() {
                         </Button>
                       ) : null}
                       <Button
+                        variant={row.isVerified ? "outline" : "ghost"}
+                        size="sm"
+                        className="h-8 px-2"
+                        onClick={() => openVerification(row)}
+                      >
+                        {row.isVerified ? "Hủy verify" : "Verify"}
+                      </Button>
+                      <Button
                         variant="ghost"
                         size="sm"
                         className="h-8 px-2"
@@ -570,7 +657,7 @@ export function AdminBlogManage() {
                   {tags.map((t) => (
                     <label
                       key={t.id}
-                      className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-border px-3 py-1.5 text-xs has-[:checked]:border-primary/50 has-[:checked]:bg-primary/10"
+                      className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-border px-3 py-1.5 text-xs has-checked:border-primary/50 has-checked:bg-primary/10"
                     >
                       <input
                         type="checkbox"
@@ -586,44 +673,6 @@ export function AdminBlogManage() {
                 </div>
               </fieldset>
             ) : null}
-            <div className="rounded-lg border border-border p-3">
-              <label className="flex cursor-pointer items-center gap-2 text-sm font-medium">
-                <input
-                  type="checkbox"
-                  checked={editIsVerified}
-                  onChange={(e) => setEditIsVerified(e.target.checked)}
-                  className="rounded border-border"
-                />
-                Đã kiểm chứng (verified)
-              </label>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Bật sẽ ghi nhận thời điểm và admin hiện tại trên server.
-              </p>
-            </div>
-            <div>
-              <label className="text-sm font-medium" htmlFor="ab-notes">
-                Ghi chú kiểm chứng
-              </label>
-              <textarea
-                id="ab-notes"
-                value={editVerificationNotes}
-                onChange={(e) => setEditVerificationNotes(e.target.value)}
-                rows={3}
-                className="mt-1.5 w-full resize-y rounded-lg border border-border bg-background px-3 py-2 text-sm"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium" htmlFor="ab-legal">
-                Phiên bản legal corpus
-              </label>
-              <Input
-                id="ab-legal"
-                value={editLegalCorpusVersion}
-                onChange={(e) => setEditLegalCorpusVersion(e.target.value)}
-                className="mt-1.5 h-10"
-                placeholder="vd. v2024.1"
-              />
-            </div>
             <div>
               <p className="text-sm font-medium">Nội dung</p>
               <div className="mt-1.5 min-h-[200px]">
@@ -641,6 +690,70 @@ export function AdminBlogManage() {
           </SheetFooter>
         </SheetContent>
       </Sheet>
+
+      <AlertDialog
+        open={verificationOpen}
+        onOpenChange={(open) => {
+          setVerificationOpen(open);
+          if (!open) {
+            setVerificationTarget(null);
+            setVerificationNotes("");
+            setVerificationLoading(false);
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {verificationTarget?.isVerified ? "Hủy verify bài viết?" : "Verify bài viết?"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {verificationTarget
+                ? verificationTarget.isVerified
+                  ? `Bài "${verificationTarget.title}" sẽ bị gỡ trạng thái verified và note hiện tại sẽ bị xóa.`
+                  : `Xác nhận verify bài "${verificationTarget.title}". Bạn có thể nhập note cho lần kiểm chứng này.`
+                : "Chọn bài viết cần cập nhật trạng thái verify."}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium" htmlFor="ab-verify-notes">
+              Ghi chú kiểm chứng
+            </label>
+            <textarea
+              id="ab-verify-notes"
+              value={verificationNotes}
+              onChange={(e) => setVerificationNotes(e.target.value)}
+              rows={4}
+              disabled={verificationLoading || verificationSaving}
+              placeholder="Nhập ghi chú cho admin..."
+              className="w-full resize-y rounded-lg border border-border bg-background px-3 py-2 text-sm disabled:opacity-60"
+            />
+            {verificationTarget?.isVerified ? (
+              <p className="text-xs text-muted-foreground">
+                Khi hủy verify, backend sẽ xóa note hiện tại theo nghiệp vụ đã chốt.
+              </p>
+            ) : null}
+          </div>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={verificationSaving}>Hủy</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={verificationLoading || verificationSaving || !verificationTarget}
+              onClick={(e) => {
+                e.preventDefault();
+                void submitVerification(!Boolean(verificationTarget?.isVerified));
+              }}
+            >
+              {verificationSaving
+                ? "Đang xử lý…"
+                : verificationTarget?.isVerified
+                  ? "Hủy verify"
+                  : "Xác nhận verify"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <Sheet open={createOpen} onOpenChange={setCreateOpen}>
         <SheetContent
@@ -727,7 +840,7 @@ export function AdminBlogManage() {
                   {tags.map((t) => (
                     <label
                       key={t.id}
-                      className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-border px-3 py-1.5 text-xs has-[:checked]:border-primary/50 has-[:checked]:bg-primary/10"
+                      className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-border px-3 py-1.5 text-xs has-checked:border-primary/50 has-checked:bg-primary/10"
                     >
                       <input
                         type="checkbox"

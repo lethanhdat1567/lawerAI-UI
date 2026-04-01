@@ -1,18 +1,10 @@
 import { apiRequest } from "@/lib/api/http.client";
 import type {
-  HubCategoryUI,
   HubCommentWithAuthor,
   HubPostDetail,
   HubPostListItem,
   HubSortMode,
 } from "@/lib/hub/types";
-
-export async function hubPublicCategories() {
-  return apiRequest<{ categories: HubCategoryUI[] }>(
-    "/api/v1/hub/categories",
-    { skipRefreshRetry: true },
-  );
-}
 
 export async function hubPublicPosts(params: {
   q?: string;

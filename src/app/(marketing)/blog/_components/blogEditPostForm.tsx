@@ -11,11 +11,8 @@ import { BlogThumbnailUploadField } from "@/app/(marketing)/blog/_components/blo
 import { RichTextEditor } from "@/components/rich-text-editor/richTextEditor";
 import { ApiError } from "@/lib/api/errors";
 import { isHtmlContentEffectivelyEmpty } from "@/lib/editor/plain-excerpt";
-import {
-  blogMePatchPost,
-  blogMePostById,
-  blogPublicTags,
-} from "@/lib/blog/blogApi";
+import { blogMePatchPost, blogMePostById } from "@/lib/blog/blogApi";
+import { blogPublicTags } from "@/lib/blog/blogTagApi";
 import type { BlogPostStatusUI, BlogTag } from "@/lib/blog/types";
 
 export function BlogEditPostForm() {

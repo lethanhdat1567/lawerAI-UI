@@ -10,7 +10,8 @@ import { RichContentPreview } from "@/components/rich-text-editor/richContentPre
 import { RichTextEditor } from "@/components/rich-text-editor/richTextEditor";
 import { ApiError } from "@/lib/api/errors";
 import { isHtmlContentEffectivelyEmpty } from "@/lib/editor/plain-excerpt";
-import { hubMeCreatePost, hubPublicCategories } from "@/lib/hub/hubApi";
+import { hubMeCreatePost } from "@/lib/hub/hubApi";
+import { hubPublicCategories } from "@/lib/hub/hubCategoryApi";
 import type { HubCategoryUI } from "@/lib/hub/types";
 
 export function HubNewPostForm() {

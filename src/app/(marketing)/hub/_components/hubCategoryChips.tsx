@@ -6,7 +6,7 @@ import { useQueryState } from "nuqs";
 import { parseAsString } from "nuqs";
 
 import { ApiError } from "@/lib/api/errors";
-import { hubPublicCategories } from "@/lib/hub/hubApi";
+import { hubPublicCategories } from "@/lib/hub/hubCategoryApi";
 import type { HubCategoryUI } from "@/lib/hub/types";
 import { cn } from "@/lib/utils";
 

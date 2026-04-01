@@ -1,17 +1,24 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { ChevronRightIcon, ScaleIcon } from "lucide-react";
 
 import { AuthField } from "@/app/(auth)/_components/authField";
+import { LawyerVerificationStatusBadge } from "@/app/(marketing)/profile/_components/lawyerVerificationStatusBadge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ApiError } from "@/lib/api/errors";
 import { resolveApiAssetUrl } from "@/lib/media/resolveApiAssetUrl";
+import {
+  lawyerVerificationMe,
+  type LawyerVerificationRecord,
+} from "@/lib/user/lawyerVerificationApi";
 import {
   profileFormSchema,
   type ProfileFormValues,
@@ -42,6 +49,10 @@ export function ProfileForm() {
     type: "ok" | "err";
     text: string;
   } | null>(null);
+  const [verification, setVerification] = useState<LawyerVerificationRecord | null>(
+    null,
+  );
+  const [verificationError, setVerificationError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -81,6 +92,18 @@ export function ProfileForm() {
         setUser(user);
         setMeUser(user);
         reset(toFormDefaults(user));
+        try {
+          const { verification } = await lawyerVerificationMe();
+          if (!cancelled) {
+            setVerification(verification);
+            setVerificationError(null);
+          }
+        } catch {
+          if (!cancelled) {
+            setVerification(null);
+            setVerificationError("Không tải được trạng thái xác minh luật sư.");
+          }
+        }
       } catch {
         if (!cancelled) {
           setLoadError("Không tải được hồ sơ. Thử làm mới trang.");
@@ -150,6 +173,29 @@ export function ProfileForm() {
   }
 
   const verified = Boolean(meUser.emailVerifiedAt);
+  const verificationHref = "/profile/verification";
+  const verificationActionLabel =
+    verification == null
+      ? "Gửi hồ sơ xác minh"
+      : verification.status === "REJECTED"
+        ? "Cập nhật và gửi lại"
+        : verification.status === "PENDING"
+          ? "Xem hồ sơ đang chờ duyệt"
+          : verification.status === "APPROVED"
+            ? "Xem trạng thái xác minh"
+            : "Xem chi tiết xác minh";
+  const verificationDescription =
+    verification == null
+      ? "Nộp thông tin hành nghề để đội ngũ quản trị xác minh và gắn badge luật sư đã xác minh."
+      : verification.status === "PENDING"
+        ? "Hồ sơ của bạn đã được gửi và đang chờ admin xét duyệt thủ công."
+        : verification.status === "REJECTED"
+          ? verification.note?.trim() ||
+            "Hồ sơ cần bổ sung hoặc chỉnh sửa trước khi gửi lại."
+          : verification.status === "APPROVED"
+            ? "Tài khoản của bạn đã được xác minh tư cách luật sư."
+            : verification.note?.trim() ||
+              "Xác minh đã bị thu hồi. Vui lòng xem chi tiết để biết tình trạng hiện tại.";
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
@@ -161,6 +207,34 @@ export function ProfileForm() {
         <p className="mt-1 text-muted-foreground">
           Trạng thái: {verified ? "Đã xác minh email" : "Chưa xác minh email"}
         </p>
+      </div>
+      <div className="rounded-none border border-border bg-card/50 px-4 py-4 text-sm">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="space-y-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-2 font-medium text-foreground">
+                <ScaleIcon className="size-4 text-primary" aria-hidden />
+                Xác minh luật sư
+              </span>
+              <LawyerVerificationStatusBadge status={verification?.status ?? null} />
+            </div>
+            <p className="text-muted-foreground">{verificationDescription}</p>
+            {verificationError ? (
+              <p className="text-destructive" role="alert">
+                {verificationError}
+              </p>
+            ) : null}
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            render={<Link href={verificationHref} />}
+          >
+            {verificationActionLabel}
+            <ChevronRightIcon className="size-4" aria-hidden />
+          </Button>
+        </div>
       </div>
       {banner ? (
         <p

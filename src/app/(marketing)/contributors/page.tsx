@@ -23,12 +23,12 @@ export default async function ContributorsPage() {
       title="Tôn vinh đóng góp"
       description="Những cá nhân đóng góp nổi bật cho Hub và blog — tiêu chí minh bạch, tôn trọng quyền ẩn danh trên bảng xếp hạng."
     >
-      <ContributorsScoringExplainer />
       <ContributorsLeaderboard
         rows={rows}
         period={period}
         fetchFailed={fetchFailed}
       />
+      <ContributorsScoringExplainer />
     </ContributorsPageLayout>
   );
 }
