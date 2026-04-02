@@ -34,7 +34,7 @@ export interface UpdateChatSessionTitleBody {
 }
 
 export interface SendChatMessageBody {
-  sessionId: string;
+  sessionId?: string;
   message: string;
 }
 

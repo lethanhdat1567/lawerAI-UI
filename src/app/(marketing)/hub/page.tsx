@@ -1,4 +1,3 @@
-// src/app/(marketing)/hub/page.tsx
 import { Suspense } from "react";
 
 import { HubFiltersToolbar } from "@/app/(marketing)/hub/_components/hubFiltersToolbar";

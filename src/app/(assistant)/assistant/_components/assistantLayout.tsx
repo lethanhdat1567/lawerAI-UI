@@ -2,7 +2,7 @@
 
 import { AssistantContent } from "@/app/(assistant)/assistant/_components/assistantContent";
 import { AssistantSidebar } from "@/app/(assistant)/assistant/_components/assistantSidebar";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import type {
   ChatAiMessage,
@@ -11,6 +11,9 @@ import type {
 } from "@/services/chat-ai/chatAiTypes";
 import { chatAiService } from "@/services/chat-ai/chatAiService";
 import { useAuthStore } from "@/stores/auth-store";
+
+const GUEST_SESSION_ID = "guest-local-session";
+const GUEST_USER_ID = "guest";
 
 export function AssistantLayout() {
   const hydrated = useAuthStore((state) => state.hydrated);
@@ -39,6 +42,12 @@ export function AssistantLayout() {
   );
   const [composerValue, setComposerValue] = useState("");
   const [isSendingMessage, setIsSendingMessage] = useState(false);
+  const selectedConversationIdRef = useRef<string | null>(null);
+  const sessionDetailRequestIdRef = useRef(0);
+
+  useEffect(() => {
+    selectedConversationIdRef.current = selectedConversationId;
+  }, [selectedConversationId]);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -55,12 +64,24 @@ export function AssistantLayout() {
 
     if (!isSignedIn) {
       setSessions([]);
+      setIsLoadingSessions(false);
       setSessionsError(null);
-      setSelectedConversationId(null);
-      setSelectedSessionDetail(null);
+      setIsCreatingSession(false);
+      setProcessingConversationId(null);
+      setSelectedConversationId(GUEST_SESSION_ID);
+      setSelectedSessionDetail((currentDetail) =>
+        currentDetail?.id === GUEST_SESSION_ID
+          ? currentDetail
+          : createGuestSessionDetail(),
+      );
+      setIsLoadingSessionDetail(false);
       setSessionDetailError(null);
       return;
     }
+
+    setSelectedConversationId(null);
+    setSelectedSessionDetail(null);
+    setSessionDetailError(null);
 
     let isCancelled = false;
 
@@ -119,7 +140,13 @@ export function AssistantLayout() {
       return;
     }
 
-    if (!isSignedIn || !selectedConversationId) {
+    if (!isSignedIn) {
+      setIsLoadingSessionDetail(false);
+      setSessionDetailError(null);
+      return;
+    }
+
+    if (!selectedConversationId) {
       setSelectedSessionDetail(null);
       setSessionDetailError(null);
       setComposerValue("");
@@ -129,6 +156,8 @@ export function AssistantLayout() {
     let isCancelled = false;
 
     const loadSessionDetail = async () => {
+      const requestId = ++sessionDetailRequestIdRef.current;
+
       setIsLoadingSessionDetail(true);
       setSessionDetailError(null);
 
@@ -137,13 +166,23 @@ export function AssistantLayout() {
           selectedConversationId,
         );
 
-        if (isCancelled) {
+        if (
+          isCancelled ||
+          requestId !== sessionDetailRequestIdRef.current ||
+          selectedConversationIdRef.current !== selectedConversationId
+        ) {
           return;
         }
 
-        setSelectedSessionDetail(nextDetail);
+        setSelectedSessionDetail((currentDetail) =>
+          mergeSessionDetail(currentDetail, nextDetail),
+        );
       } catch (error) {
-        if (isCancelled) {
+        if (
+          isCancelled ||
+          requestId !== sessionDetailRequestIdRef.current ||
+          selectedConversationIdRef.current !== selectedConversationId
+        ) {
           return;
         }
 
@@ -301,6 +340,7 @@ export function AssistantLayout() {
   const handleSendMessage = async () => {
     const sessionId = selectedConversationId;
     const content = composerValue.trim();
+    const requestSessionId = isSignedIn ? sessionId : undefined;
 
     if (!sessionId || !content || isSendingMessage) {
       return;
@@ -331,6 +371,10 @@ export function AssistantLayout() {
 
       return {
         ...currentDetail,
+        title:
+          !isSignedIn && currentDetail.messages.length === 0
+            ? createGuestConversationTitle(content)
+            : currentDetail.title,
         updatedAt: optimisticUserMessage.createdAt,
         messages: [
           ...currentDetail.messages,
@@ -342,7 +386,7 @@ export function AssistantLayout() {
 
     try {
       const response = await chatAiService.sendMessage({
-        sessionId,
+        sessionId: requestSessionId ?? undefined,
         message: content,
       });
       const reader = response.body?.getReader();
@@ -380,30 +424,85 @@ export function AssistantLayout() {
 
       assistantContent += decoder.decode();
 
-      await Promise.all([
-        refreshSessionDetail(sessionId),
-        refreshSessions({
-          preserveSelectedId: sessionId,
-          nextSearchValue: "",
-        }),
-      ]);
+      setSelectedSessionDetail((currentDetail) => {
+        if (!currentDetail || currentDetail.id !== sessionId) {
+          return currentDetail;
+        }
+
+        return {
+          ...currentDetail,
+          messages: currentDetail.messages.map((message) =>
+            message.id === optimisticAssistantMessage.id
+              ? { ...message, content: assistantContent }
+              : message,
+          ),
+        };
+      });
+
+      if (requestSessionId) {
+        await Promise.all([
+          refreshSessionDetail(requestSessionId),
+          refreshSessions({
+            preserveSelectedId: requestSessionId,
+            nextSearchValue: "",
+          }),
+        ]);
+      }
     } catch (error) {
       setSessionDetailError(
         error instanceof Error ? error.message : "Không gửi được tin nhắn.",
       );
       setComposerValue(content);
-      await refreshSessionDetail(sessionId);
+
+      if (!requestSessionId) {
+        setSelectedSessionDetail((currentDetail) => {
+          if (!currentDetail || currentDetail.id !== sessionId) {
+            return currentDetail;
+          }
+
+          return {
+            ...currentDetail,
+            messages: currentDetail.messages.filter(
+              (message) =>
+                message.id !== optimisticUserMessage.id &&
+                message.id !== optimisticAssistantMessage.id,
+            ),
+          };
+        });
+        return;
+      }
+
+      await refreshSessionDetail(requestSessionId);
     } finally {
       setIsSendingMessage(false);
     }
   };
 
   const refreshSessionDetail = async (sessionId: string) => {
+    const requestId = ++sessionDetailRequestIdRef.current;
+
     try {
       const nextDetail = await chatAiService.getSessionDetail(sessionId);
-      setSelectedSessionDetail(nextDetail);
+
+      if (
+        requestId !== sessionDetailRequestIdRef.current ||
+        selectedConversationIdRef.current !== sessionId
+      ) {
+        return;
+      }
+
+      setSelectedSessionDetail((currentDetail) =>
+        mergeSessionDetail(currentDetail, nextDetail),
+      );
       setSessionDetailError(null);
     } catch (error) {
+      if (
+        requestId !== sessionDetailRequestIdRef.current ||
+        selectedConversationIdRef.current !== sessionId
+      ) {
+        return;
+      }
+
       setSessionDetailError(
         error instanceof Error
           ? error.message
@@ -475,7 +574,9 @@ export function AssistantLayout() {
         isSendingMessage={isSendingMessage}
         messages={selectedSessionDetail?.messages ?? []}
         selectedConversationId={selectedConversationId}
-        selectedConversationTitle={selectedConversation?.title ?? null}
+        selectedConversationTitle={
+          selectedConversation?.title ?? selectedSessionDetail?.title ?? null
+        }
         sessionDetailError={sessionDetailError}
         onComposerChange={setComposerValue}
         onSendMessage={handleSendMessage}
@@ -500,4 +601,59 @@ function formatUpdatedAt(value: string): string {
 
 function createTempId(prefix: string): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function createGuestConversationTitle(content: string): string {
+  const normalizedContent = content.trim().replace(/\s+/g, " ");
+
+  if (!normalizedContent) {
+    return "Cuộc hội thoại tạm";
+  }
+
+  return normalizedContent.slice(0, 60);
+}
+
+function createGuestSessionDetail(): ChatAiSessionDetail {
+  const createdAt = new Date().toISOString();
+
+  return {
+    id: GUEST_SESSION_ID,
+    title: "Cuộc hội thoại tạm",
+    createdAt,
+    updatedAt: createdAt,
+    userId: GUEST_USER_ID,
+    messages: [],
+  };
+}
+
+function mergeSessionDetail(
+  currentDetail: ChatAiSessionDetail | null,
+  nextDetail: ChatAiSessionDetail,
+): ChatAiSessionDetail {
+  if (!currentDetail || currentDetail.id !== nextDetail.id) {
+    return nextDetail;
+  }
+
+  if (currentDetail.messages.length > nextDetail.messages.length) {
+    return {
+      ...nextDetail,
+      messages: currentDetail.messages,
+    };
+  }
+
+  const currentLastMessage = currentDetail.messages.at(-1);
+  const nextLastMessage = nextDetail.messages.at(-1);
+
+  if (
+    currentLastMessage?.role === "assistant" &&
+    nextLastMessage?.role === "assistant" &&
+    currentLastMessage.content.length > nextLastMessage.content.length
+  ) {
+    return {
+      ...nextDetail,
+      messages: currentDetail.messages,
+    };
+  }
+
+  return nextDetail;
 }

@@ -24,7 +24,9 @@ export function AssistantSidebarConversationSection({
   }
 
   if (isGuest) {
-    return <AssistantSidebarState description="Đăng nhập để xem và quản lý lịch sử hội thoại." />;
+    return (
+      <AssistantSidebarState description="Chế độ khách không lưu lịch sử. Đăng nhập để xem và quản lý các hội thoại đã lưu." />
+    );
   }
 
   if (isLoading) {

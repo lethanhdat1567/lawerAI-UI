@@ -2,6 +2,7 @@
 
 import { Menu } from "lucide-react";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 interface AssistantContentHeaderProps {
@@ -32,12 +33,22 @@ export function AssistantContentHeader({
       ) : null}
 
       <div className="min-w-0">
-        <p className="truncate text-sm font-medium text-slate-900 dark:text-slate-100">
-          {selectedConversationTitle ?? "Cuộc hội thoại mới"}
-        </p>
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="truncate text-sm font-medium text-slate-900 dark:text-slate-100">
+            {selectedConversationTitle ?? "Cuộc hội thoại mới"}
+          </p>
+          {isGuest ? (
+            <Badge
+              variant="secondary"
+              className="rounded-none border-black/5 bg-slate-100 text-slate-700 dark:border-white/10 dark:bg-white/5 dark:text-slate-200"
+            >
+              Nên đăng nhập để lưu lịch sử
+            </Badge>
+          ) : null}
+        </div>
         <p className="text-xs text-slate-500 dark:text-slate-400">
           {isGuest
-            ? "Bạn chưa đăng nhập nên lịch sử hội thoại sẽ không được đồng bộ."
+            ? "Bạn vẫn có thể dùng AI ngay, nhưng lịch sử hội thoại sẽ không được đồng bộ."
             : "Hội thoại đang được đồng bộ thời gian thực với backend."}
         </p>
       </div>

@@ -2,6 +2,12 @@
 
 export type HubPostStatusUI = "PUBLISHED" | "HIDDEN";
 
+export type HubAiFeedbackStatus =
+  | "PENDING"
+  | "PROCESSING"
+  | "COMPLETED"
+  | "FAILED";
+
 export interface HubAuthor {
   id: string;
   username: string;
@@ -26,6 +32,13 @@ export interface HubOversightVersionUI {
   modelVersion: string | null;
   isCurrent: boolean;
   createdAt: string;
+}
+
+export interface HubAiFeedback {
+  status: HubAiFeedbackStatus;
+  rawResponse: unknown | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface HubCommentUI {
@@ -59,6 +72,7 @@ export interface HubPostRecord {
   updatedAt: string;
   comments: HubCommentUI[];
   oversightVersions: HubOversightVersionUI[];
+  aiFeedback?: HubAiFeedback | null;
 }
 
 export interface HubPostListItem {
@@ -77,7 +91,7 @@ export interface HubPostListItem {
 export interface HubPostDetail extends HubPostListItem {
   body: string;
   comments: HubCommentWithAuthor[];
-  oversightVersions: HubOversightVersionUI[];
+  aiFeedback: HubAiFeedback | null;
 }
 
 export type HubSortMode = "new" | "updated";

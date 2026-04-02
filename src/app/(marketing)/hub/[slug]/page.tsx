@@ -1,12 +1,11 @@
-// src/app/(marketing)/hub/[slug]/page.tsx
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeftIcon } from "lucide-react";
 import { notFound } from "next/navigation";
 
+import { HubAiFeedbackPanel } from "@/app/(marketing)/hub/_components/hubAiFeedbackPanel";
 import { HubCommentComposer } from "@/app/(marketing)/hub/_components/hubCommentComposer";
 import { HubCommentTree } from "@/app/(marketing)/hub/_components/hubCommentTree";
-import { HubOversightPanel } from "@/app/(marketing)/hub/_components/hubOversightPanel";
 import { HubPostBody } from "@/app/(marketing)/hub/_components/hubPostBody";
 import { HubPostDetailHeader } from "@/app/(marketing)/hub/_components/hubPostDetailHeader";
 import { buildCommentTree } from "@/lib/hub/buildCommentTree";
@@ -74,10 +73,7 @@ export default async function HubPostPage({ params }: HubPostPageProps) {
             </div>
           </section>
         </div>
-
-        <div className="mt-12 lg:mt-0">
-          <HubOversightPanel versions={post.oversightVersions} />
-        </div>
+        <HubAiFeedbackPanel feedback={post.aiFeedback} />
       </article>
     </div>
   );

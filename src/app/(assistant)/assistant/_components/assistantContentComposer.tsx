@@ -33,7 +33,6 @@ export function AssistantContentComposer({
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const isGuest = authMode === "guest";
   const isComposerDisabled =
-    isGuest ||
     !selectedConversationId ||
     isLoadingSessionDetail ||
     isSendingMessage;
@@ -91,7 +90,7 @@ export function AssistantContentComposer({
             disabled={isComposerDisabled}
             placeholder={
               isGuest
-                ? "Đăng nhập để bắt đầu trò chuyện"
+                ? "Nhập câu hỏi để dùng thử AI. Đăng nhập để lưu lịch sử hội thoại."
                 : "Nhập câu hỏi pháp lý của bạn..."
             }
             value={composerValue}

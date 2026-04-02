@@ -9,7 +9,6 @@ import {
 import { buildCommentTree } from "@/lib/hub/buildCommentTree";
 import type {
   HubCommentWithAuthor,
-  HubOversightVersionUI,
   HubPostDetail,
   HubPostListItem,
   HubSortMode,
@@ -20,7 +19,10 @@ export { buildCommentTree };
 const EXCERPT_LEN = 180;
 
 function excerptFromBody(body: string): string {
-  const flat = body.replace(/\*\*([^*]+)\*\*/g, "$1").replace(/\n+/g, " ").trim();
+  const flat = body
+    .replace(/\*\*([^*]+)\*\*/g, "$1")
+    .replace(/\n+/g, " ")
+    .trim();
   if (flat.length <= EXCERPT_LEN) return flat;
   return `${flat.slice(0, EXCERPT_LEN).trim()}…`;
 }
@@ -104,23 +106,6 @@ export function getPostBySlug(slug: string): HubPostDetail | null {
     ...base,
     body: p.body,
     comments,
-    oversightVersions: p.oversightVersions,
+    aiFeedback: p.aiFeedback ?? null,
   };
-}
-
-export function getCurrentOversight(
-  versions: HubOversightVersionUI[]
-): HubOversightVersionUI | null {
-  const current = versions.find((v) => v.isCurrent);
-  if (current) return current;
-  if (versions.length === 0) return null;
-  return [...versions].sort((a, b) => b.version - a.version)[0];
-}
-
-export function parseSuggestionItems(json: unknown): string[] {
-  if (!json || typeof json !== "object") return [];
-  const o = json as Record<string, unknown>;
-  const items = o.items;
-  if (!Array.isArray(items)) return [];
-  return items.filter((x): x is string => typeof x === "string");
 }

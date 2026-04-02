@@ -15,15 +15,39 @@ import { cn } from "@/lib/utils";
 
 interface AssistantMarkdownBlockProps {
   content: string;
+  isStreaming: boolean;
   showStreamingCursor: boolean;
 }
 
 export function AssistantMarkdownBlock({
   content,
+  isStreaming,
   showStreamingCursor,
 }: AssistantMarkdownBlockProps) {
+  const [isChunkAnimating, setIsChunkAnimating] = useState(false);
+
+  useEffect(() => {
+    if (!content || !isStreaming) {
+      setIsChunkAnimating(false);
+      return;
+    }
+
+    setIsChunkAnimating(true);
+
+    const timeoutId = window.setTimeout(() => {
+      setIsChunkAnimating(false);
+    }, 180);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [content, isStreaming]);
+
   return (
-    <div className="max-w-3xl text-sm leading-7 text-slate-800 dark:text-slate-200">
+    <div
+      className={cn(
+        "max-w-3xl text-sm leading-7 text-slate-800 transition-all duration-200 dark:text-slate-200",
+        isChunkAnimating && "translate-y-0.5 opacity-90",
+      )}
+    >
       {content ? (
         <Markdown components={markdownComponents} remarkPlugins={[remarkGfm]}>
           {content}

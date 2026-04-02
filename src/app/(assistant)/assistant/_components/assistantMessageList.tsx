@@ -42,8 +42,9 @@ function AssistantMessageBlock({
 }: AssistantMessageBlockProps) {
   const isUserMessage = message.role === "user";
   const isAssistantMessage = message.role === "assistant";
+  const isAssistantStreaming = isAssistantMessage && isLast && isStreaming;
   const showStreamingCursor =
-    isAssistantMessage && isLast && isStreaming && message.content.length >= 0;
+    isAssistantStreaming && message.content.length >= 0;
 
   return (
     <article
@@ -67,6 +68,7 @@ function AssistantMessageBlock({
           </div>
           <AssistantMarkdownBlock
             content={message.content}
+            isStreaming={isAssistantStreaming}
             showStreamingCursor={showStreamingCursor}
           />
         </div>

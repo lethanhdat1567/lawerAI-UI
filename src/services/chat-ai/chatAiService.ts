@@ -97,10 +97,14 @@ export const chatAiService = {
   },
 
   async sendMessage(body: SendChatMessageBody): Promise<Response> {
-    const normalizedBody = {
-      sessionId: requireNonEmptyValue(body.sessionId, "sessionId is required"),
-      message: requireNonEmptyValue(body.message, "message is required"),
-    };
+    const normalizedMessage = requireNonEmptyValue(body.message, "message is required");
+    const normalizedBody =
+      body.sessionId === undefined
+        ? { message: normalizedMessage }
+        : {
+            sessionId: requireNonEmptyValue(body.sessionId, "sessionId is required"),
+            message: normalizedMessage,
+          };
     const url = `${getApiBaseUrl()}/api/v1/chat-ai`;
     const execute = () => runStreamRequest(url, normalizedBody);
 

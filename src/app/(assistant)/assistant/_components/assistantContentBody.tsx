@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useMemo, useRef } from "react";
+
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 import { AssistantContentState } from "@/app/(assistant)/assistant/_components/assistantContentState";
@@ -24,20 +26,52 @@ export function AssistantContentBody({
   selectedConversationId,
   sessionDetailError,
 }: AssistantContentBodyProps) {
-  const isGuest = authMode === "guest";
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const latestMessageKey = useMemo(() => {
+    const latestMessage = messages.at(-1);
+
+    if (!latestMessage) {
+      return "empty";
+    }
+
+    return `${latestMessage.id}:${latestMessage.content.length}`;
+  }, [messages]);
+
+  useEffect(() => {
+    if (!selectedConversationId || !messages.length) {
+      return;
+    }
+
+    const frameId = window.requestAnimationFrame(() => {
+      messagesEndRef.current?.scrollIntoView({
+        behavior: isSendingMessage ? "smooth" : "auto",
+        block: "end",
+      });
+    });
+
+    return () => window.cancelAnimationFrame(frameId);
+  }, [
+    isSendingMessage,
+    latestMessageKey,
+    messages.length,
+    selectedConversationId,
+  ]);
 
   return (
     <ScrollArea className="min-h-0 flex-1 overflow-y-auto [scrollbar-width:thin]">
       <div className="mx-auto flex w-full max-w-4xl flex-col px-6 py-10 sm:px-8 sm:py-12">
-        {isGuest ? (
+        {!selectedConversationId ? (
           <AssistantContentState
-            description="Đăng nhập để xem lịch sử hội thoại và tiếp tục trao đổi với AI."
-            title="Cần đăng nhập để sử dụng hội thoại đã lưu"
-          />
-        ) : !selectedConversationId ? (
-          <AssistantContentState
-            description="Hãy chọn một hội thoại trong sidebar hoặc tạo cuộc hội thoại mới để bắt đầu."
-            title="Chưa có hội thoại được chọn"
+            description={
+              authMode === "guest"
+                ? "Hãy nhập câu hỏi đầu tiên để bắt đầu dùng thử LawerAI."
+                : "Hãy chọn một hội thoại trong sidebar hoặc tạo cuộc hội thoại mới để bắt đầu."
+            }
+            title={
+              authMode === "guest"
+                ? "Sẵn sàng trò chuyện cùng AI"
+                : "Chưa có hội thoại được chọn"
+            }
           />
         ) : isLoadingSessionDetail ? (
           <AssistantContentState
@@ -60,6 +94,7 @@ export function AssistantContentBody({
             messages={messages}
           />
         )}
+        <div ref={messagesEndRef} aria-hidden="true" />
       </div>
     </ScrollArea>
   );
