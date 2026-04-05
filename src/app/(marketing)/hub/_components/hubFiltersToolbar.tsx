@@ -11,7 +11,7 @@ import type { HubSortMode } from "@/lib/hub/types";
 export function HubFiltersToolbar() {
   const [sort, setSort] = useQueryState(
     "sort",
-    hubSortParser.withOptions({ shallow: true })
+    hubSortParser.withOptions({ shallow: true }),
   );
 
   return (
@@ -21,7 +21,10 @@ export function HubFiltersToolbar() {
           <HubSearchBar />
         </div>
         <div className="flex shrink-0 flex-col gap-2 sm:flex-row sm:items-center">
-          <label htmlFor="hub-sort" className="text-xs font-medium text-muted-foreground sm:sr-only">
+          <label
+            htmlFor="hub-sort"
+            className="text-xs font-medium text-muted-foreground sm:sr-only"
+          >
             Sắp xếp
           </label>
           <select

@@ -11,8 +11,8 @@ export const metadata: Metadata = {
 export default function ProfilePage() {
   return (
     <PageShell
-      title="Hồ sơ"
-      description="Cập nhật thông tin hiển thị, ảnh đại diện và tùy chọn đóng góp."
+      title="Tài khoản"
+      description="Quản lý thông tin cá nhân, ảnh đại diện và tùy chọn hiển thị đóng góp."
     >
       <ProfileForm />
     </PageShell>

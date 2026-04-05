@@ -1,6 +1,11 @@
 "use client";
 
-import { MessageSquarePlus, Search, SidebarClose, Sparkles } from "lucide-react";
+import {
+  MessageSquarePlus,
+  Search,
+  SidebarClose,
+  Sparkles,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -12,6 +17,7 @@ import { AssistantSidebarConversationSection } from "./assistantSidebarConversat
 import { AssistantSidebarDeleteDialog } from "./assistantSidebarDeleteDialog";
 import { AssistantSidebarFooter } from "./assistantSidebarFooter";
 import type { AssistantSidebarProps } from "./assistantSidebar.types";
+import Link from "next/link";
 
 export function AssistantSidebar({
   authMode,
@@ -32,10 +38,12 @@ export function AssistantSidebar({
   onToggleSidebar,
 }: AssistantSidebarProps) {
   const isGuest = authMode === "guest";
-  const [editingConversationId, setEditingConversationId] = useState<string | null>(
-    null,
-  );
-  const [deleteConversationId, setDeleteConversationId] = useState<string | null>(null);
+  const [editingConversationId, setEditingConversationId] = useState<
+    string | null
+  >(null);
+  const [deleteConversationId, setDeleteConversationId] = useState<
+    string | null
+  >(null);
 
   useEffect(() => {
     if (!isOpen) {
@@ -56,16 +64,20 @@ export function AssistantSidebar({
           isOpen ? "w-[296px]" : "w-0 overflow-hidden border-r-0",
         )}
       >
-        <div className="flex items-center justify-between border-b border-black/5 px-4 py-3 dark:border-white/10">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2 text-slate-900 dark:text-slate-100">
-              <Sparkles className="size-4" />
-              <p className="truncate text-sm font-semibold">LawerAI Assistant</p>
+        <div className="flex items-center justify-between border-b border-black/5 px-4 py-2.5 dark:border-white/10">
+          <Link href="/">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 text-slate-900 dark:text-slate-100">
+                <Sparkles className="size-4" />
+                <p className="truncate text-sm font-semibold">
+                  Trợ lý Pháp luật AI
+                </p>
+              </div>
+              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                Hội thoại thông minh, giải pháp tức thì
+              </p>
             </div>
-            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-              Không gian hội thoại tối giản
-            </p>
-          </div>
+          </Link>
 
           <Button
             aria-label="Đóng sidebar"
@@ -85,7 +97,9 @@ export function AssistantSidebar({
             onClick={onCreateConversation}
           >
             <MessageSquarePlus className="size-4" />
-            {isCreatingConversation ? "Đang tạo hội thoại..." : "New Chat"}
+            {isCreatingConversation
+              ? "Đang tạo hội thoại..."
+              : "Tạo cuộc hội thoại mới"}
           </Button>
 
           <div className="relative">
@@ -106,7 +120,9 @@ export function AssistantSidebar({
           ) : null}
 
           {sessionsError ? (
-            <p className="text-xs text-red-500 dark:text-red-400">{sessionsError}</p>
+            <p className="text-xs text-red-500 dark:text-red-400">
+              {sessionsError}
+            </p>
           ) : null}
         </div>
 
@@ -121,7 +137,9 @@ export function AssistantSidebar({
             <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">
               Cuộc trò chuyện
             </p>
-            <p className="text-xs text-slate-400 dark:text-slate-500">{conversations.length}</p>
+            <p className="text-xs text-slate-400 dark:text-slate-500">
+              {conversations.length}
+            </p>
           </div>
 
           <AssistantSidebarConversationSection

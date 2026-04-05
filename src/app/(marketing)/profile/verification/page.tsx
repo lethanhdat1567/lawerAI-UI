@@ -10,8 +10,8 @@ export const metadata: Metadata = {
 export default function LawyerVerificationPage() {
   return (
     <PageShell
-      title="Xác minh luật sư"
-      description="Gửi và theo dõi hồ sơ xác minh tư cách luật sư của bạn."
+      title="Xác thực chuyên gia"
+      description="Gửi và theo dõi hồ sơ chứng minh tư cách hành nghề của bạn."
     >
       <LawyerVerificationPanel />
     </PageShell>

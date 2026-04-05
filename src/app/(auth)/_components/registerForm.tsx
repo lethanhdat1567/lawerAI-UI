@@ -52,7 +52,9 @@ export function RegisterForm() {
       });
     } catch (err) {
       const text =
-        err instanceof ApiError ? err.message : "Đăng ký thất bại. Thử lại sau.";
+        err instanceof ApiError
+          ? "Email đã tồn tại."
+          : "Tạo tài khoản thất bại. Thử lại sau.";
       setMessage({ type: "error", text });
     }
   }
@@ -69,7 +71,6 @@ export function RegisterForm() {
           type="email"
           autoComplete="email"
           aria-invalid={Boolean(errors.email)}
-          placeholder="ban@example.com"
           className="h-10"
           {...register("email")}
         />
@@ -85,7 +86,6 @@ export function RegisterForm() {
           id="reg-username"
           autoComplete="username"
           aria-invalid={Boolean(errors.username)}
-          placeholder="nguyen_van_a"
           className="h-10"
           {...register("username")}
         />
@@ -100,7 +100,6 @@ export function RegisterForm() {
           id="reg-display"
           autoComplete="name"
           aria-invalid={Boolean(errors.displayName)}
-          placeholder="Nguyễn Văn A"
           className="h-10"
           {...register("displayName")}
         />

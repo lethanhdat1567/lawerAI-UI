@@ -7,13 +7,6 @@ import type { ContributorsLeaderboardPeriod } from "@/lib/contributors/fetchLead
 import { resolvePublicImageUrl } from "@/lib/media/resolvePublicImageUrl";
 import { userProfilePath } from "@/lib/user/profilePath";
 
-function periodDescriptionVi(period: ContributorsLeaderboardPeriod): string {
-  if (period === "all_time") {
-    return "Toàn thời gian — xếp hạng theo tổng điểm đóng góp tích lũy.";
-  }
-  return "";
-}
-
 function initialsFor(row: ContributorRow): string {
   if (row.contributorOptOut) return "•";
   const base =
@@ -45,41 +38,38 @@ function avatarSrcFor(row: ContributorRow): string | null {
 
 interface ContributorsLeaderboardProps {
   rows: ContributorRow[];
-  period: ContributorsLeaderboardPeriod;
   fetchFailed?: boolean;
 }
 
 export function ContributorsLeaderboard({
   rows,
-  period,
   fetchFailed,
 }: ContributorsLeaderboardProps) {
-  const periodLabel = periodDescriptionVi(period);
-
   return (
     <section className="mt-14" aria-labelledby="contributors-board-heading">
       <h2
         id="contributors-board-heading"
         className="font-heading text-xl font-bold tracking-tight text-foreground sm:text-2xl"
       >
-        Bảng xếp hạng
+        Bảng vinh danh đóng góp
       </h2>
       <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-        Xếp hạng theo tổng điểm tích lũy. Người bật &quot;Ẩn danh trên bảng xếp
-        hạng&quot; trong hồ sơ vẫn giữ hạng và điểm, nhưng không hiển thị tên
-        hoặc ảnh đại diện công khai.
+        Thứ hạng được tính dựa trên tổng điểm tích lũy từ các hoạt động trên hệ
+        thống. Nếu bạn chọn chế độ &quot;Ẩn danh&quot;, điểm số và vị trí vẫn
+        được bảo lưu nhưng thông tin cá nhân sẽ không hiển thị công khai.
       </p>
 
       {fetchFailed ? (
-        <p className="mt-6 rounded-xl border border-dashed border-destructive/40 bg-destructive/5 px-4 py-6 text-sm text-muted-foreground">
-          Không tải được bảng xếp hạng. Kiểm tra kết nối API hoặc thử lại sau.
+        <p className="mt-6 rounded-xl border border-dashed border-destructive/40 bg-destructive/5 px-4 py-8 text-center text-sm text-muted-foreground">
+          Rất tiếc, hệ thống không thể tải dữ liệu lúc này. Vui lòng làm mới
+          trang hoặc quay lại sau ít phút.
         </p>
       ) : null}
 
       {!fetchFailed && rows.length === 0 ? (
-        <p className="mt-6 rounded-xl border border-dashed border-border bg-card/30 px-4 py-10 text-center text-sm text-muted-foreground">
-          Chưa có điểm đóng góp nào để hiển thị. Khi cộng đồng tích điểm, bảng
-          sẽ cập nhật tại đây.
+        <p className="mt-6 rounded-xl border border-dashed border-border bg-card/30 px-4 py-12 text-center text-sm text-muted-foreground">
+          Bảng xếp hạng hiện đang trống. Hãy là người đầu tiên đóng góp tri thức
+          và ghi tên mình tại đây!
         </p>
       ) : null}
 
@@ -263,7 +253,10 @@ export function ContributorsLeaderboard({
                     {sub ? (
                       <p className="truncate text-xs text-muted-foreground">
                         {profileHref ? (
-                          <Link href={profileHref} className="hover:text-primary">
+                          <Link
+                            href={profileHref}
+                            className="hover:text-primary"
+                          >
                             {sub}
                           </Link>
                         ) : (
@@ -302,29 +295,6 @@ export function ContributorsLeaderboard({
           })}
         </ul>
       ) : null}
-
-      <footer className="mt-8 rounded-2xl border border-dashed border-border bg-card/30 px-5 py-4 text-sm leading-relaxed text-muted-foreground">
-        <p>
-          <strong className="text-foreground">{periodLabel}</strong>
-        </p>
-        <p className="mt-3">
-          Khám phá nội dung cộng đồng trên{" "}
-          <Link
-            href="/hub"
-            className="font-semibold text-primary underline-offset-4 hover:underline"
-          >
-            Hub
-          </Link>{" "}
-          và{" "}
-          <Link
-            href="/blog"
-            className="font-semibold text-primary underline-offset-4 hover:underline"
-          >
-            Blog
-          </Link>
-          .
-        </p>
-      </footer>
     </section>
   );
 }

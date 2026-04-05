@@ -62,6 +62,7 @@ export function SiteHeader() {
   const user = useAuthStore((s) => s.user);
   const accessToken = useAuthStore((s) => s.accessToken);
   const isSignedIn = Boolean(user ?? accessToken);
+  const isAdmin = user?.role?.toLowerCase() === "admin";
   const headerAvatarSrc = user
     ? resolvePublicImageUrl(user.profile.avatarUrl)
     : null;
@@ -165,9 +166,14 @@ export function SiteHeader() {
                 <DropdownMenuItem onClick={() => router.push("/profile")}>
                   Hồ sơ
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => router.push("/my")}>
+                <DropdownMenuItem onClick={() => router.push("/my/hub")}>
                   Nội dung của tôi
                 </DropdownMenuItem>
+                {isAdmin ? (
+                  <DropdownMenuItem onClick={() => router.push("/admin")}>
+                    Admin
+                  </DropdownMenuItem>
+                ) : null}
                 <DropdownMenuItem
                   variant="destructive"
                   onClick={() => void signOutClient()}
@@ -198,7 +204,7 @@ export function SiteHeader() {
             href="/assistant"
             className="hidden rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-[0_0_24px_-4px_oklch(0.72_0.22_285/0.65)] transition-[transform,box-shadow] hover:scale-[1.02] hover:shadow-[0_0_32px_-4px_oklch(0.72_0.22_285/0.8)] md:inline-flex"
           >
-            Bắt đầu
+            Hỏi đáp AI
           </Link>
 
           <Sheet open={mobileNavOpen} onOpenChange={setMobileNavOpen}>

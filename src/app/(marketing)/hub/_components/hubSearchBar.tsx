@@ -8,7 +8,9 @@ import { SearchIcon } from "lucide-react";
 export function HubSearchBar() {
   const [q, setQ] = useQueryState(
     "q",
-    parseAsString.withDefault("").withOptions({ shallow: true, throttleMs: 300 })
+    parseAsString
+      .withDefault("")
+      .withOptions({ shallow: true, throttleMs: 300 }),
   );
 
   return (
@@ -25,7 +27,7 @@ export function HubSearchBar() {
         type="search"
         value={q}
         onChange={(e) => void setQ(e.target.value || null)}
-        placeholder="Ví dụ: đất đai, hợp đồng, thử việc…"
+        placeholder="Bạn cần tư vấn về chủ đề gì? (Đất đai, Hôn nhân, Lao động...)"
         className="h-11 w-full rounded-xl border border-border bg-card/60 py-2 pl-10 pr-3 text-sm text-foreground placeholder:text-muted-foreground backdrop-blur-md focus:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/20"
       />
     </div>

@@ -33,7 +33,7 @@ export default function HubPage() {
   return (
     <HubPageLayout
       title="Không gian thảo luận"
-      description="Đăng tình huống thực tế, nhận phản hồi cộng đồng và xem tóm tắt AI thư ký. Nội dung đồng bộ từ LawyerAI-api."
+      description="Chia sẻ tình huống pháp lý thực tế, thảo luận cùng cộng đồng chuyên gia và nhận ngay phân tích chuyên sâu từ Thư ký Luật AI."
       action={<HubNewPostCta />}
     >
       <Suspense fallback={<HubSkeleton />}>

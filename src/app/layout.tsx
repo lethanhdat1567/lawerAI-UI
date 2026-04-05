@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     template: "%s · LawyerAI",
   },
   description:
-    "Tra cứu điều luật liên quan, thảo luận Hub với AI thư ký, blog đã kiểm chứng — tham khảo, không thay tư vấn luật sư.",
+    "Tra cứu điều luật liên quan, thảo luận cộng đồng với AI thư ký, blog đã kiểm chứng — tham khảo, không thay tư vấn luật sư.",
 };
 
 interface RootLayoutProps {

@@ -16,25 +16,25 @@ const stats: Stat[] = [
   {
     value: 1200,
     suffix: "+",
-    label: "Văn bản pháp",
-    description: "Đã index để tra cứu",
+    label: "Văn bản pháp luật",
+    description: "Đã kiểm chứng",
   },
   {
     value: 500,
     suffix: "+",
     label: "Thảo luận",
-    description: "Mỗi tuần trên Hub",
+    description: "Mỗi tuần trên cộng đồng",
   },
   {
     value: 98,
     suffix: "%",
     label: "Có trích dẫn",
-    description: "Kèm nguồn & timestamp",
+    description: "Kèm nguồn uy tín",
   },
   {
     prefix: "< ",
     value: 2,
-    suffix: "s",
+    suffix: " giây",
     label: "Phản hồi",
     description: "Trung bình mỗi lượt",
   },
@@ -71,7 +71,9 @@ function StatItem({ stat, active }: { stat: Stat; active: boolean }) {
           <span>{active ? count.toLocaleString("vi-VN") : "0"}</span>
           <span className="text-primary">{stat.suffix}</span>
         </p>
-        <p className="mt-2 text-sm font-semibold text-foreground">{stat.label}</p>
+        <p className="mt-2 text-sm font-semibold text-foreground">
+          {stat.label}
+        </p>
         <p className="mt-1 text-xs text-muted-foreground">{stat.description}</p>
       </div>
     </div>

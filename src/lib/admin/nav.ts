@@ -7,6 +7,8 @@ import {
   LayoutDashboard,
   MessagesSquare,
   Scale,
+  Settings2,
+  Sparkles,
   Tags,
   Trophy,
   Users,
@@ -26,6 +28,8 @@ export const adminNavMain: AdminNavItem[] = [
   { title: "Hub Categories", href: "/admin/hub-categories", icon: Tags },
   { title: "Blog", href: "/admin/blog", icon: FileText },
   { title: "Blog Tags", href: "/admin/blog-tags", icon: Tags },
+  { title: "Blog ideas & lịch AI", href: "/admin/blog-ideas", icon: Sparkles },
+  { title: "Prompt AI", href: "/admin/ai-management", icon: Settings2 },
   { title: "Bảng xếp hạng", href: "/admin/leaderboard", icon: Trophy },
   { title: "Crawl", href: "/admin/crawl", icon: Bot },
 ];

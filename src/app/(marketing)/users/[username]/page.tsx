@@ -35,7 +35,11 @@ function profileTitle(p: PublicProfile): string {
   return `${name} · Hồ sơ`;
 }
 
-function formatCount(count: number, singular: string, plural = singular): string {
+function formatCount(
+  count: number,
+  singular: string,
+  plural = singular,
+): string {
   return `${count} ${count === 1 ? singular : plural}`;
 }
 
@@ -202,8 +206,7 @@ export default async function PublicUserProfilePage({ params }: Props) {
             </p>
           ) : (
             <div className="mt-4 rounded-2xl border border-dashed border-border bg-background/60 px-4 py-5 text-sm leading-relaxed text-muted-foreground">
-              Người dùng chưa thêm phần giới thiệu. Hồ sơ hiện ưu tiên hiển thị
-              dấu ấn hoạt động và các nội dung công khai trên nền tảng.
+              Chưa có thông tin giới thiệu.
             </div>
           )}
         </article>
@@ -218,13 +221,17 @@ export default async function PublicUserProfilePage({ params }: Props) {
                 label: "Bài blog mới nhất",
                 title: spotlightBlog?.title ?? "Chưa có bài blog công khai",
                 href: spotlightBlog ? `/blog/${spotlightBlog.slug}` : null,
-                description: spotlightBlog?.excerpt ?? "Khi user xuất bản bài viết, nội dung mới nhất sẽ xuất hiện ở đây.",
+                description:
+                  spotlightBlog?.excerpt ??
+                  "Khi user xuất bản bài viết, nội dung mới nhất sẽ xuất hiện ở đây.",
               },
               {
                 label: "Chủ đề hub gần đây",
                 title: spotlightHub?.title ?? "Chưa có chủ đề hub công khai",
                 href: spotlightHub ? `/hub/${spotlightHub.slug}` : null,
-                description: spotlightHub?.excerpt ?? "Khi user bắt đầu thảo luận trên Hub, chủ đề gần đây nhất sẽ xuất hiện ở đây.",
+                description:
+                  spotlightHub?.excerpt ??
+                  "Khi user bắt đầu thảo luận trên Hub, chủ đề gần đây nhất sẽ xuất hiện ở đây.",
               },
             ].map((item) => (
               <div
@@ -317,7 +324,7 @@ export default async function PublicUserProfilePage({ params }: Props) {
                 className="size-5 text-primary opacity-90"
                 aria-hidden
               />
-              Thảo luận Hub
+              Thảo luận cộng đồng
             </h2>
             <p className="text-sm text-muted-foreground">
               Những chủ đề gần đây cho thấy {display} đang quan tâm và trao đổi
@@ -328,13 +335,13 @@ export default async function PublicUserProfilePage({ params }: Props) {
             href="/hub"
             className="text-sm font-medium text-primary hover:underline"
           >
-            Xem Hub
+            Xem cộng đồng
           </Link>
         </div>
         {hubItems.length === 0 ? (
           <p className="rounded-2xl border border-dashed border-border bg-card/30 px-4 py-8 text-center text-sm text-muted-foreground">
-            Chưa có chủ đề Hub công khai. Khi user tham gia thảo luận, nội dung
-            sẽ xuất hiện tại đây.
+            Chưa có chủ đề cộng đồng công khai. Khi user tham gia thảo luận, nội
+            dung sẽ xuất hiện tại đây.
           </p>
         ) : (
           <>

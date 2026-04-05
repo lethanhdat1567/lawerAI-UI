@@ -2,25 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  BookmarkIcon,
-  BookOpenIcon,
-  LayoutDashboardIcon,
-  MessagesSquareIcon,
-} from "lucide-react";
+import { BookmarkIcon, BookOpenIcon, MessagesSquareIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
 const NAV = [
   {
-    href: "/my",
-    label: "Tổng quan",
-    icon: LayoutDashboardIcon,
-    match: (pathname: string) => pathname === "/my",
-  },
-  {
     href: "/my/hub",
-    label: "Thảo luận Hub",
+    label: "Thảo luận cộng đồng",
     icon: MessagesSquareIcon,
     match: (pathname: string) =>
       pathname === "/my/hub" || pathname.startsWith("/my/hub/"),
@@ -39,8 +28,7 @@ const NAV = [
     label: "Đã lưu",
     icon: BookmarkIcon,
     match: (pathname: string) =>
-      pathname === "/my/blog/saved" ||
-      pathname.startsWith("/my/blog/saved/"),
+      pathname === "/my/blog/saved" || pathname.startsWith("/my/blog/saved/"),
   },
 ] as const;
 

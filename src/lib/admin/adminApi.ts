@@ -278,3 +278,28 @@ export async function adminCrawlDraft(body: AdminCrawlDraftRequest) {
     body,
   });
 }
+
+export type AdminAiConfig = {
+  id: number;
+  advisor_prompt: string;
+  community_prompt: string;
+  blog_prompt: string;
+  updatedAt: string;
+};
+
+export type AdminAiConfigPatchBody = {
+  advisor_prompt?: string;
+  community_prompt?: string;
+  blog_prompt?: string;
+};
+
+export async function adminAiConfigGet() {
+  return apiRequest<{ config: AdminAiConfig }>("/api/v1/admin/ai-config");
+}
+
+export async function adminAiConfigPatch(body: AdminAiConfigPatchBody) {
+  return apiRequest<{ config: AdminAiConfig }>("/api/v1/admin/ai-config", {
+    method: "PATCH",
+    body,
+  });
+}

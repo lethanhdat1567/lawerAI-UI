@@ -2,6 +2,15 @@
 
 export const PASSWORD_MIN_LENGTH = 8;
 
+/** Mã đặt lại mật khẩu từ BE (randomNumericCode) — 6 chữ số */
+export const RESET_CODE_LENGTH = 6;
+
+const RESET_CODE_RE = new RegExp(`^\\d{${RESET_CODE_LENGTH}}$`);
+
+export function isValidResetCode(value: string): boolean {
+  return RESET_CODE_RE.test(value.trim());
+}
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function isValidEmail(value: string): boolean {

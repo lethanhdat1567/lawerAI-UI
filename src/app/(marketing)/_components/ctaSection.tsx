@@ -27,19 +27,24 @@ export function CtaSection() {
           }}
         />
         <div className="relative">
-          <p className="text-sm italic text-muted-foreground">
-            &ldquo;Lần đầu tôi hiểu rõ điều luật đất đai của mình.&rdquo;
+          {/* Quote Section tinh chỉnh */}
+          <p className="text-sm font-medium italic leading-relaxed text-foreground/90">
+            &ldquo;Pháp luật cần được hiểu đúng, hiểu đủ và trích dẫn thực. Đó
+            là tiêu chuẩn duy nhất chúng tôi đặt ra tại LawyerAI.&rdquo;
           </p>
-          <p className="mt-2 text-xs text-muted-foreground">— Người dùng thử</p>
+          <p className="mt-3 text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+            — Lê Thành Đạt · Founder
+          </p>
 
           <h2 className="mt-10 font-heading text-3xl font-extrabold tracking-tight sm:text-4xl">
-            Tham gia{" "}
+            Bắt đầu cùng{" "}
             <span className="bg-gradient-to-r from-primary to-[oklch(0.78_0.16_300)] bg-clip-text text-transparent">
               LawyerAI
             </span>
           </h2>
-          <p className="mx-auto mt-3 max-w-md text-muted-foreground">
-            Tạo tài khoản hoặc mở Hub — luôn kèm nhắc nhở pháp lý phù hợp.
+          <p className="mx-auto mt-3 max-w-md text-sm text-muted-foreground leading-relaxed">
+            Tham gia cộng đồng pháp lý minh bạch. Truy xuất dữ liệu nguồn và
+            thảo luận chuyên sâu ngay hôm nay.
           </p>
 
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -47,21 +52,23 @@ export function CtaSection() {
               href="/register"
               className="inline-flex h-12 items-center justify-center rounded-full bg-primary px-8 text-sm font-semibold text-primary-foreground shadow-[0_0_28px_-4px_oklch(0.72_0.2_285/0.65)] transition-[transform,box-shadow] hover:scale-[1.02] hover:shadow-[0_0_36px_-4px_oklch(0.72_0.2_285/0.8)]"
             >
-              Đăng ký miễn phí
+              Trải nghiệm miễn phí
             </Link>
             <Link
               href="/hub"
               className="inline-flex h-12 items-center justify-center rounded-full border border-border bg-muted/40 px-8 text-sm font-semibold text-foreground backdrop-blur-sm transition-colors hover:border-border"
             >
-              Xem Hub
+              Khám phá Hub
               <ArrowRightIcon className="ml-2 size-4" />
             </Link>
           </div>
 
-          <p className="mt-6 text-sm text-muted-foreground">
-            Đã có hơn{" "}
-            <span className="font-semibold text-foreground">2.400</span> người đăng
-            ký
+          <p className="mt-6 text-[12px] font-medium text-muted-foreground">
+            Hệ thống đã hỗ trợ hơn{" "}
+            <span className="font-bold text-foreground tracking-tighter text-sm">
+              2.400+
+            </span>{" "}
+            truy vấn pháp lý
           </p>
         </div>
       </motion.div>

@@ -14,7 +14,7 @@ export default function LoginPage() {
   return (
     <AuthPageLayout
       title="Đăng nhập"
-      description="Truy cập tài khoản để lưu hội thoại tra cứu và đóng góp trên Hub."
+      description="Trở thành thành viên để cá nhân hóa trải nghiệm tra cứu luật, lưu trữ lịch sử tư vấn AI và đóng góp giá trị cho cộng đồng LawyerAI Hub."
     >
       <Suspense fallback={null}>
         <LoginForm />

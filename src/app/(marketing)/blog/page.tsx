@@ -31,9 +31,9 @@ function BlogSkeleton() {
 
 export default function BlogPage() {
   return (
-      <BlogPageLayout
+    <BlogPageLayout
       title="Blog & kiến thức"
-      description="Bài viết chuyên sâu; bài có nhãn Verified khi đã được kiểm chứng nội dung trên hệ thống."
+      description="Kiến thức pháp lý chuyên sâu; các bài viết gắn nhãn Verified đã được đội ngũ luật sư và hệ thống kiểm chứng độ chính xác."
     >
       <Suspense fallback={<BlogSkeleton />}>
         <BlogFiltersToolbar />

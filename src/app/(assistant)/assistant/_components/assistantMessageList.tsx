@@ -56,7 +56,7 @@ function AssistantMessageBlock({
       )}
     >
       {isUserMessage ? (
-        <div className="border border-black/5 bg-slate-50 px-4 py-3 dark:border-white/10 dark:bg-white/3">
+        <div className="border border-black/5 bg-slate-50 px-4 py-3 dark:border-white/10 dark:bg-white/3 rounded-sm">
           <div className="whitespace-pre-wrap text-sm leading-7 text-slate-800 dark:text-slate-200">
             {message.content}
           </div>

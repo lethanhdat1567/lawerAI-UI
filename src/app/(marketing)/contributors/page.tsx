@@ -16,18 +16,13 @@ export default async function ContributorsPage() {
   const data = await fetchContributorsLeaderboard({ limit: 50 });
   const fetchFailed = data === null;
   const rows = data?.items ?? [];
-  const period = data?.period ?? "all_time";
 
   return (
     <ContributorsPageLayout
-      title="Tôn vinh đóng góp"
-      description="Những cá nhân đóng góp nổi bật cho Hub và blog — tiêu chí minh bạch, tôn trọng quyền ẩn danh trên bảng xếp hạng."
+      title="Những gương mặt nổi bật"
+      description="Nơi tôn vinh các thành viên có đóng góp xuất sắc cho Hub và Blog. Chúng tôi đề cao sự minh bạch trong đánh giá và tôn trọng quyền riêng tư của mỗi cá nhân."
     >
-      <ContributorsLeaderboard
-        rows={rows}
-        period={period}
-        fetchFailed={fetchFailed}
-      />
+      <ContributorsLeaderboard rows={rows} fetchFailed={fetchFailed} />
       <ContributorsScoringExplainer />
     </ContributorsPageLayout>
   );

@@ -2,7 +2,12 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { ExternalLinkIcon, Loader2Icon, PenSquareIcon, Trash2Icon } from "lucide-react";
+import {
+  ExternalLinkIcon,
+  Loader2Icon,
+  PenSquareIcon,
+  Trash2Icon,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -124,7 +129,7 @@ export function MyHubManage() {
       <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="font-heading text-3xl font-bold tracking-tight md:text-4xl">
-            Thảo luận Hub của bạn
+            Thảo luận cộng đồng của bạn
           </h1>
           <p className="mt-2 max-w-xl text-muted-foreground">
             Xem và quản lý các bài thảo luận của bạn.
@@ -149,105 +154,107 @@ export function MyHubManage() {
         </div>
       ) : (
         <div className="space-y-6">
-        <div className="rounded-2xl border border-border bg-card/30">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="min-w-[200px]">Tiêu đề</TableHead>
-                <TableHead>Danh mục</TableHead>
-                <TableHead>Trạng thái</TableHead>
-                <TableHead>Cập nhật</TableHead>
-                <TableHead className="text-right">Bình luận</TableHead>
-                <TableHead className="w-[200px] text-right">Thao tác</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {posts.map((p) => (
-                <TableRow key={p.id}>
-                  <TableCell className="max-w-[280px] whitespace-normal font-medium">
-                    <span className="line-clamp-2">{p.title}</span>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {p.category?.name ?? "—"}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={hubStatusBadgeVariant(p.status)}>
-                      {hubStatusLabel(p.status)}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="tabular-nums text-muted-foreground">
-                    {formatPostDate(p.updatedAt)}
-                  </TableCell>
-                  <TableCell className="text-right tabular-nums">
-                    {p.commentCount}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-wrap items-center justify-end gap-1">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 px-2"
-                        render={<Link href={`/hub/${p.slug}`} />}
-                      >
-                        <ExternalLinkIcon className="size-3.5" aria-hidden />
-                        Xem
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 px-2"
-                        render={<Link href={`/hub/edit/${p.id}`} />}
-                      >
-                        Sửa
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 px-2 text-destructive hover:text-destructive"
-                        onClick={() => setPostToDelete(p)}
-                      >
-                        <Trash2Icon className="size-3.5" aria-hidden />
-                      </Button>
-                    </div>
-                  </TableCell>
+          <div className="rounded-2xl border border-border bg-card/30">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="min-w-[200px]">Tiêu đề</TableHead>
+                  <TableHead>Danh mục</TableHead>
+                  <TableHead>Trạng thái</TableHead>
+                  <TableHead>Cập nhật</TableHead>
+                  <TableHead className="text-right">Bình luận</TableHead>
+                  <TableHead className="w-[200px] text-right">
+                    Thao tác
+                  </TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+              </TableHeader>
+              <TableBody>
+                {posts.map((p) => (
+                  <TableRow key={p.id}>
+                    <TableCell className="max-w-[280px] whitespace-normal font-medium">
+                      <span className="line-clamp-2">{p.title}</span>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {p.category?.name ?? "—"}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={hubStatusBadgeVariant(p.status)}>
+                        {hubStatusLabel(p.status)}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="tabular-nums text-muted-foreground">
+                      {formatPostDate(p.updatedAt)}
+                    </TableCell>
+                    <TableCell className="text-right tabular-nums">
+                      {p.commentCount}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap items-center justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 px-2"
+                          render={<Link href={`/hub/${p.slug}`} />}
+                        >
+                          <ExternalLinkIcon className="size-3.5" aria-hidden />
+                          Xem
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 px-2"
+                          render={<Link href={`/hub/edit/${p.id}`} />}
+                        >
+                          Sửa
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 px-2 text-destructive hover:text-destructive"
+                          onClick={() => setPostToDelete(p)}
+                        >
+                          <Trash2Icon className="size-3.5" aria-hidden />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
 
-        <div className="flex flex-col items-center gap-3 border-t border-border pt-4 sm:flex-row sm:justify-between">
-          <p className="order-2 text-center text-xs text-muted-foreground sm:order-1 sm:text-left">
-            {total > 0 ? (
-              <>
-                Hiển thị{" "}
-                <span className="font-medium text-foreground">
-                  {(page - 1) * PAGE_SIZE + 1}
-                  –
-                  {(page - 1) * PAGE_SIZE + posts.length}
-                </span>{" "}
-                trong{" "}
-                <span className="font-medium text-foreground">{total}</span> bài
-                {totalPages > 1 ? (
-                  <>
-                    {" "}
-                    · Trang{" "}
-                    <span className="font-medium text-foreground">
-                      {page}/{totalPages}
-                    </span>
-                  </>
-                ) : null}
-              </>
-            ) : null}
-          </p>
-          <Pagination
-            className="order-1 sm:order-2"
-            page={page}
-            totalPages={totalPages}
-            onPageChange={(p) => setPage(p)}
-            ariaLabel="Phân trang bài Hub của tôi"
-          />
-        </div>
+          <div className="flex flex-col items-center gap-3 border-t border-border pt-4 sm:flex-row sm:justify-between">
+            <p className="order-2 text-center text-xs text-muted-foreground sm:order-1 sm:text-left">
+              {total > 0 ? (
+                <>
+                  Hiển thị{" "}
+                  <span className="font-medium text-foreground">
+                    {(page - 1) * PAGE_SIZE + 1}–
+                    {(page - 1) * PAGE_SIZE + posts.length}
+                  </span>{" "}
+                  trong{" "}
+                  <span className="font-medium text-foreground">{total}</span>{" "}
+                  bài
+                  {totalPages > 1 ? (
+                    <>
+                      {" "}
+                      · Trang{" "}
+                      <span className="font-medium text-foreground">
+                        {page}/{totalPages}
+                      </span>
+                    </>
+                  ) : null}
+                </>
+              ) : null}
+            </p>
+            <Pagination
+              className="order-1 sm:order-2"
+              page={page}
+              totalPages={totalPages}
+              onPageChange={(p) => setPage(p)}
+              ariaLabel="Phân trang bài Hub của tôi"
+            />
+          </div>
         </div>
       )}
 

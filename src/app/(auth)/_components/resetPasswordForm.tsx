@@ -1,15 +1,17 @@
-// src/components/auth/reset-password-form.tsx
+// src/app/(auth)/_components/resetPasswordForm.tsx
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 import { AuthField } from "@/app/(auth)/_components/authField";
 import { AuthPasswordInput } from "@/app/(auth)/_components/authPasswordInput";
 import {
   isValidEmail,
+  isValidResetCode,
   PASSWORD_MIN_LENGTH,
+  RESET_CODE_LENGTH,
 } from "@/app/(auth)/_components/authValidation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +19,7 @@ import { ApiError } from "@/lib/api/errors";
 import { authService } from "@/services/auth/authService";
 
 export function ResetPasswordForm() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const emailHint = searchParams.get("email")?.trim() ?? "";
 
@@ -27,6 +30,11 @@ export function ResetPasswordForm() {
     text: string;
   } | null>(null);
   const [pending, setPending] = useState(false);
+
+  useEffect(() => {
+    const fromQuery = searchParams.get("email")?.trim() ?? "";
+    if (fromQuery) setEmail(fromQuery);
+  }, [searchParams]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -43,6 +51,8 @@ export function ResetPasswordForm() {
     if (!emailVal) next.email = "Nhập email.";
     else if (!isValidEmail(emailVal)) next.email = "Email không hợp lệ.";
     if (!code) next.code = "Nhập mã từ email.";
+    else if (!isValidResetCode(code))
+      next.code = `Mã gồm đúng ${RESET_CODE_LENGTH} chữ số.`;
     if (!password) next.password = "Nhập mật khẩu mới.";
     else if (password.length < PASSWORD_MIN_LENGTH)
       next.password = `Mật khẩu tối thiểu ${PASSWORD_MIN_LENGTH} ký tự.`;
@@ -62,6 +72,9 @@ export function ResetPasswordForm() {
         newPassword: password,
       });
       setMessage({ type: "ok", text: msg });
+      window.setTimeout(() => {
+        router.replace("/login?pwdReset=success");
+      }, 1200);
     } catch (err) {
       setMessage({
         type: "error",
@@ -78,7 +91,8 @@ export function ResetPasswordForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-5" noValidate>
       <p className="text-sm leading-relaxed text-muted-foreground">
-        Nhập email đã dùng khi yêu cầu khôi phục và mã gồm các chữ số gửi qua email.
+        Nhập email đã dùng khi yêu cầu khôi phục và mã {RESET_CODE_LENGTH} chữ số gửi qua
+        email.
       </p>
 
       <AuthField label="Email" htmlFor="reset-email" error={errors.email}>
@@ -101,6 +115,8 @@ export function ResetPasswordForm() {
           name="code"
           inputMode="numeric"
           autoComplete="one-time-code"
+          maxLength={RESET_CODE_LENGTH}
+          pattern={`[0-9]{${RESET_CODE_LENGTH}}`}
           aria-invalid={Boolean(errors.code)}
           placeholder="123456"
           className="h-10 font-mono tracking-widest"
@@ -144,7 +160,7 @@ export function ResetPasswordForm() {
 
       <Button
         type="submit"
-        className="h-11 w-full rounded-xl border border-border bg-primary text-base font-semibold text-primary-foreground shadow-none hover:bg-primary/90"
+        className="h-11 w-full rounded-none border border-border bg-primary text-base font-semibold text-primary-foreground shadow-none hover:bg-primary/90"
         size="lg"
         disabled={pending}
       >

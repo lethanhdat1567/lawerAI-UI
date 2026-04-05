@@ -66,14 +66,12 @@ export function BlogPostCard({
           {userEngagement && (userEngagement.liked || userEngagement.saved) ? (
             <div
               className="pointer-events-none absolute right-2 top-2 flex max-w-[calc(100%-1rem)] flex-wrap justify-end gap-1"
-              aria-label={
-                [
-                  userEngagement.liked ? "Bạn đã thích bài này" : null,
-                  userEngagement.saved ? "Bạn đã lưu bài này" : null,
-                ]
-                  .filter(Boolean)
-                  .join(". ")
-              }
+              aria-label={[
+                userEngagement.liked ? "Bạn đã thích bài này" : null,
+                userEngagement.saved ? "Bạn đã lưu bài này" : null,
+              ]
+                .filter(Boolean)
+                .join(". ")}
             >
               {userEngagement.liked ? (
                 <span className="inline-flex items-center gap-0.5 rounded-full border border-rose-500/35 bg-rose-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-rose-700 dark:text-rose-300">
@@ -83,10 +81,7 @@ export function BlogPostCard({
               ) : null}
               {userEngagement.saved ? (
                 <span className="inline-flex items-center gap-0.5 rounded-full border border-primary/35 bg-primary/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary">
-                  <BookmarkIcon
-                    className="size-2.5 fill-current"
-                    aria-hidden
-                  />
+                  <BookmarkIcon className="size-2.5 fill-current" aria-hidden />
                   Đã lưu
                 </span>
               ) : null}
@@ -116,7 +111,7 @@ export function BlogPostCard({
               </span>
             ) : null}
           </div>
-          <h2 className="mt-2 font-heading text-base font-bold leading-snug tracking-tight text-foreground group-hover:text-primary sm:text-lg">
+          <h2 className="mt-2 line-clamp-3 font-heading text-base font-bold leading-snug tracking-tight text-foreground group-hover:text-primary sm:text-lg">
             {post.title}
           </h2>
           <p className="mt-1.5 line-clamp-2 flex-1 text-sm leading-snug text-muted-foreground">

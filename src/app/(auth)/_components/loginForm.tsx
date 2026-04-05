@@ -23,6 +23,7 @@ function safeNextPath(raw: string | null): string | null {
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pwdResetSuccess = searchParams.get("pwdReset") === "success";
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
@@ -70,7 +71,7 @@ export function LoginForm() {
     } catch (err) {
       const text =
         err instanceof ApiError
-          ? err.message
+          ? "Email hoặc mật khẩu không chính xác."
           : "Đăng nhập thất bại. Thử lại sau.";
       setFormMessage({ type: "error", text });
     } finally {
@@ -80,11 +81,16 @@ export function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5" noValidate>
-      <AuthField
-        label="Email"
-        htmlFor="login-email"
-        error={emailError}
-      >
+      {pwdResetSuccess ? (
+        <p
+          className="rounded-none border border-primary/25 bg-primary/10 px-4 py-3 text-sm text-primary"
+          role="status"
+        >
+          Mật khẩu đã được cập nhật. Đăng nhập bằng mật khẩu mới.
+        </p>
+      ) : null}
+
+      <AuthField label="Email" htmlFor="login-email" error={emailError}>
         <Input
           id="login-email"
           name="email"
@@ -94,7 +100,6 @@ export function LoginForm() {
           onChange={(ev) => setEmail(ev.target.value)}
           aria-invalid={Boolean(emailError)}
           aria-describedby={emailError ? "login-email-error" : undefined}
-          placeholder="ban@example.com"
           className="h-10"
         />
       </AuthField>
@@ -114,17 +119,9 @@ export function LoginForm() {
       </AuthField>
 
       <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
-        <label className="flex cursor-pointer items-center gap-2 text-muted-foreground">
-          <input
-            name="remember"
-            type="checkbox"
-            className="size-4 rounded border-border bg-input/30 accent-primary"
-          />
-          Ghi nhớ đăng nhập
-        </label>
         <Link
           href="/forgot-password"
-          className="font-medium text-primary underline-offset-4 hover:underline"
+          className="font-medium text-primary underline-offset-4 hover:underline ml-auto"
         >
           Quên mật khẩu?
         </Link>
@@ -133,7 +130,9 @@ export function LoginForm() {
       {formMessage.text ? (
         <p
           className={
-            formMessage.type === "error" ? "text-sm text-red-400" : "text-sm text-muted-foreground"
+            formMessage.type === "error"
+              ? "text-sm text-red-400"
+              : "text-sm text-muted-foreground"
           }
           role="status"
         >

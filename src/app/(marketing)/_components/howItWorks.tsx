@@ -18,21 +18,21 @@ const steps: Step[] = [
     icon: <PenLineIcon className="size-4" aria-hidden />,
     title: "Mô tả tình huống",
     description:
-      "Viết ngắn gọn vấn đề pháp lý — không cần biết số điều luật cụ thể.",
+      "Trình bày vấn đề bằng ngôn ngữ tự nhiên. Hệ thống tự động phân loại mà không yêu cầu bạn phải thuộc lòng điều luật.",
   },
   {
     number: "02",
     icon: <SparklesIcon className="size-4" aria-hidden />,
-    title: "AI trích dẫn điều khoản",
+    title: "AI đối soát dữ liệu",
     description:
-      "RAG trả về điều luật liên quan, có nguồn và thời điểm tra cứu.",
+      "Công nghệ RAG truy xuất tức thời các điều khoản liên quan, đính kèm nguồn dẫn và thời điểm cập nhật mới nhất.",
   },
   {
     number: "03",
     icon: <UsersIcon className="size-4" aria-hidden />,
-    title: "Thảo luận & kiểm chứng",
+    title: "Xác thực cộng đồng",
     description:
-      "Đăng Hub để cộng đồng bổ sung; bài đủ chuẩn được nhãn Verified.",
+      "Chia sẻ lên Hub để nhận phản biện từ chuyên gia. Những nội dung đạt chuẩn sẽ được gắn nhãn Verified uy tín.",
   },
 ];
 

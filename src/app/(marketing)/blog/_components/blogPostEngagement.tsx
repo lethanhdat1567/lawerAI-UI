@@ -82,7 +82,9 @@ export function BlogPostEngagement({
       setLiked(r.liked);
       setLikeCount(r.likeCount);
     } catch (e) {
-      toast.error(e instanceof ApiError ? e.message : "Không cập nhật được thích.");
+      toast.error(
+        e instanceof ApiError ? e.message : "Không cập nhật được thích.",
+      );
     } finally {
       setLikeBusy(false);
     }
@@ -97,14 +99,16 @@ export function BlogPostEngagement({
       setSavedCount(r.savedCount);
       toast.success(r.saved ? "Đã lưu bài." : "Đã bỏ lưu.");
     } catch (e) {
-      toast.error(e instanceof ApiError ? e.message : "Không cập nhật được lưu.");
+      toast.error(
+        e instanceof ApiError ? e.message : "Không cập nhật được lưu.",
+      );
     } finally {
       setSaveBusy(false);
     }
   }
 
   return (
-    <div className="flex flex-col items-center gap-3 border-b border-border pb-8">
+    <div className="flex flex-col items-center gap-3 border-b border-border p-4">
       <div
         className="flex w-full max-w-md flex-wrap items-center justify-center gap-y-2 sm:max-w-lg"
         role="group"

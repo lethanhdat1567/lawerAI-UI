@@ -16,7 +16,7 @@ const placeholderOrgs = [
   { name: "Sinh viên luật", icon: GraduationCapIcon },
   { name: "Startup VN", icon: RocketIcon },
   { name: "Độc giả blog", icon: BookOpenIcon },
-  { name: "Luật sư tình nguyện", icon: HeartHandshakeIcon },
+  { name: "Luật sư", icon: HeartHandshakeIcon },
   { name: "Trung tâm tư vấn", icon: BuildingIcon },
 ] as const;
 
@@ -60,7 +60,10 @@ export function TrustedStrip() {
                   className="flex shrink-0 items-center gap-10 pr-10"
                 >
                   <span className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/50 px-3 py-1.5 text-sm text-muted-foreground">
-                    <Icon className="size-3.5 shrink-0 text-primary/70" aria-hidden />
+                    <Icon
+                      className="size-3.5 shrink-0 text-primary/70"
+                      aria-hidden
+                    />
                     {name}
                   </span>
                   <span

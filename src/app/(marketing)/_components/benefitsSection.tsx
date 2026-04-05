@@ -1,28 +1,33 @@
 // src/components/marketing/benefits-section.tsx
 "use client";
 
-import { ClockIcon, FileSearchIcon, LockIcon, ShieldCheckIcon } from "lucide-react";
+import {
+  ClockIcon,
+  FileSearchIcon,
+  LockIcon,
+  ShieldCheckIcon,
+} from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 
 const benefits = [
   {
-    title: "Có nguồn rõ ràng",
-    body: "Mỗi gợi ý kèm trích dẫn văn bản để bạn tự đối chiếu.",
+    title: "Minh bạch nguồn dẫn",
+    body: "Không có sự mơ hồ. Mọi phản hồi từ AI đều đi kèm trích dẫn văn bản luật chính xác để bạn đối soát tức thời.",
     icon: FileSearchIcon,
   },
   {
-    title: "An toàn ngữ cảnh",
-    body: "Luôn nhắc: thông tin mang tính tham khảo, không thay luật sư.",
+    title: "Phạm vi an toàn",
+    body: "Chúng tôi đề cao tính chuẩn xác. LawyerAI đóng vai trò trợ lý sàng lọc thông tin trước khi bạn làm việc với luật sư.",
     icon: ShieldCheckIcon,
   },
   {
-    title: "Phản hồi nhanh",
-    body: "RAG tối ưu cho câu hỏi pháp lý thường gặp tại Việt Nam.",
+    title: "Tốc độ xử lý RAG",
+    body: "Thay vì đọc hàng trăm trang tài liệu, hệ thống quét và tổng hợp dữ liệu pháp luật Việt Nam chỉ trong vài giây.",
     icon: ClockIcon,
   },
   {
-    title: "Quyền riêng tư",
-    body: "Bạn kiểm soát dữ liệu chia sẻ; không bán hồ sơ cho bên thứ ba.",
+    title: "Bảo mật tuyệt đối",
+    body: "Dữ liệu của bạn là tài sản riêng tư. Chúng tôi cam kết không lưu trữ hoặc khai thác hồ sơ cho mục đích thương mại.",
     icon: LockIcon,
   },
 ] as const;

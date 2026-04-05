@@ -26,16 +26,13 @@ export function BlogPostSidebar({ post }: { post: BlogPostDetail }) {
         {post.isVerified && post.verifiedAt ? (
           <div className="mt-4 space-y-3 text-sm">
             <p className="text-muted-foreground">
-              <span className="font-medium text-foreground">Đã kiểm chứng:</span>{" "}
+              <span className="font-medium text-foreground">
+                Đã kiểm chứng:
+              </span>{" "}
               <time dateTime={post.verifiedAt}>
                 {formatDateTime(post.verifiedAt)}
               </time>
             </p>
-            {post.legalCorpusVersion ? (
-              <p className="rounded-lg border border-border bg-muted/50 px-2 py-1.5 font-mono text-xs text-muted-foreground">
-                Corpus: {post.legalCorpusVersion}
-              </p>
-            ) : null}
             {post.verificationNotes ? (
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">

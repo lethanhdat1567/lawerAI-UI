@@ -49,7 +49,7 @@ export function AssistantContentHeader({
         <p className="text-xs text-slate-500 dark:text-slate-400">
           {isGuest
             ? "Bạn vẫn có thể dùng AI ngay, nhưng lịch sử hội thoại sẽ không được đồng bộ."
-            : "Hội thoại đang được đồng bộ thời gian thực với backend."}
+            : "Đồng bộ hóa dữ liệu thời gian thực."}
         </p>
       </div>
     </div>

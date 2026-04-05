@@ -25,7 +25,10 @@ export function MyDashboard() {
     <div className="space-y-10">
       <header>
         <h1 className="font-heading text-3xl font-bold tracking-tight md:text-4xl">
-          Xin chào{user?.profile.displayName?.trim() ? `, ${user.profile.displayName.trim()}` : ""}
+          Xin chào
+          {user?.profile.displayName?.trim()
+            ? `, ${user.profile.displayName.trim()}`
+            : ""}
         </h1>
         <p className="mt-2 text-muted-foreground">
           Tổng quan bài đăng Hub và Blog của bạn.
@@ -36,11 +39,18 @@ export function MyDashboard() {
         <div className="rounded-2xl border border-border bg-card/50 p-5">
           <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
             <MessagesSquareIcon className="size-4 text-primary" aria-hidden />
-            Thảo luận Hub
+            Thảo luận cộng đồng
           </div>
-          <p className="mt-3 text-3xl font-bold tabular-nums">{hubPosts.length}</p>
+          <p className="mt-3 text-3xl font-bold tabular-nums">
+            {hubPosts.length}
+          </p>
           <p className="mt-1 text-xs text-muted-foreground">Tổng số bài</p>
-          <Button variant="outline" size="sm" className="mt-4" render={<Link href="/my/hub" />}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="mt-4"
+            render={<Link href="/my/hub" />}
+          >
             Quản lý
             <ArrowRightIcon className="size-3.5" />
           </Button>
@@ -50,9 +60,18 @@ export function MyDashboard() {
             <BookOpenIcon className="size-4 text-primary" aria-hidden />
             Blog
           </div>
-          <p className="mt-3 text-3xl font-bold tabular-nums">{blogPosts.length}</p>
-          <p className="mt-1 text-xs text-muted-foreground">Bài đang có trong demo</p>
-          <Button variant="outline" size="sm" className="mt-4" render={<Link href="/my/blog" />}>
+          <p className="mt-3 text-3xl font-bold tabular-nums">
+            {blogPosts.length}
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Bài đang có trong demo
+          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            className="mt-4"
+            render={<Link href="/my/blog" />}
+          >
             Quản lý
             <ArrowRightIcon className="size-3.5" />
           </Button>
@@ -90,7 +109,10 @@ export function MyDashboard() {
             {hubPosts.length === 0 ? (
               <li className="rounded-xl border border-dashed border-border px-4 py-6 text-center text-sm text-muted-foreground">
                 Chưa có bài Hub khớp tài khoản.{" "}
-                <Link href="/hub/new" className="font-semibold text-primary hover:underline">
+                <Link
+                  href="/hub/new"
+                  className="font-semibold text-primary hover:underline"
+                >
                   Đăng bài mới
                 </Link>
               </li>

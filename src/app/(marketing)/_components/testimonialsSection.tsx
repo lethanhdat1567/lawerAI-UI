@@ -6,19 +6,19 @@ import { motion, useReducedMotion } from "framer-motion";
 
 const quotes = [
   {
-    text: "Cuối cùng tôi biết phải đọc điều luật nào trước khi làm việc với UBND.",
-    name: "Chị Minh · Hà Nội",
-    role: "Chủ hộ",
+    text: "Tiết kiệm hàng giờ tự tra cứu. LawyerAI giúp tôi khoanh vùng chính xác các nghị định liên quan trước khi tiến hành thủ tục hành chính.",
+    name: "Minh Trần",
+    role: "Hà Nội · Quản lý hộ kinh doanh",
   },
   {
-    text: "Hub giúp mình thấy góc nhìn khác nhưng vẫn có nguồn để kiểm.",
-    name: "An Khôi · TP.HCM",
-    role: "Founder",
+    text: "Hệ thống RAG phản hồi cực kỳ logic. Việc đối soát nguồn dẫn ngay trên Hub giúp tôi tự tin hơn khi thảo luận các điều khoản hợp đồng mới.",
+    name: "An Khôi",
+    role: "TP.HCM · Tech Founder",
   },
   {
-    text: "Blog Verified là nơi mình gửi link cho khách hàng đọc thêm.",
-    name: "LS. thực hành · Ẩn danh",
-    role: "Luật sư",
+    text: "Một công cụ hỗ trợ sàng lọc thông tin sơ bộ rất tốt. Tôi thường dùng các bài Blog Verified để giải thích cơ sở pháp lý cho khách hàng một cách trực quan.",
+    name: "LS. Quốc Nam",
+    role: "Đà Nẵng · Luật sư cộng tác",
   },
 ] as const;
 
@@ -60,15 +60,14 @@ export function TestimonialsSection() {
               }}
               className="relative flex flex-col rounded-2xl border border-border bg-gradient-to-b from-card/60 to-card/30 p-6 backdrop-blur-md"
             >
-              <QuoteIcon
-                className="size-8 text-primary/40"
-                aria-hidden
-              />
+              <QuoteIcon className="size-8 text-primary/40" aria-hidden />
               <p className="mt-4 flex-1 text-sm leading-relaxed text-foreground/95">
                 &ldquo;{q.text}&rdquo;
               </p>
               <footer className="mt-5 border-t border-border pt-4">
-                <p className="text-sm font-semibold text-foreground">{q.name}</p>
+                <p className="text-sm font-semibold text-foreground">
+                  {q.name}
+                </p>
                 <p className="text-xs text-muted-foreground">{q.role}</p>
               </footer>
             </motion.blockquote>

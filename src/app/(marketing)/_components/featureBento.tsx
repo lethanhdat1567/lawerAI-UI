@@ -30,12 +30,15 @@ function RagPreview() {
   return (
     <div className="mt-5 space-y-2 rounded-xl border border-border bg-muted/50 p-4">
       <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-        Ví dụ kết quả
+        Nguồn dẫn tham chiếu
       </p>
       {results.map((r) => (
         <div key={r.law} className="flex items-center gap-3">
-          <CheckCircle2Icon className="size-3.5 shrink-0 text-primary" aria-hidden />
-          <span className="flex-1 truncate text-xs text-foreground/90">
+          <CheckCircle2Icon
+            className="size-3.5 shrink-0 text-primary"
+            aria-hidden
+          />
+          <span className="flex-1 truncate text-xs text-foreground/90 font-medium">
             {r.law}
           </span>
           <span className="text-[11px] tabular-nums text-muted-foreground">
@@ -49,29 +52,29 @@ function RagPreview() {
 
 const features: FeatureCard[] = [
   {
-    title: "Tra cứu có trích dẫn",
+    title: "Truy xuất nguồn dẫn thực",
     description:
-      "Mô tả tình huống, nhận điều luật liên quan và giải thích dễ hiểu — kèm nguồn và thời điểm tra cứu.",
+      "Phân tích tình huống dựa trên dữ liệu RAG. Hệ thống tự động trích xuất các điều khoản liên quan kèm thời điểm ban hành mới nhất.",
     icon: <ScaleIcon className="size-4" aria-hidden />,
     className: "md:col-span-2",
     preview: <RagPreview />,
   },
   {
-    title: "Hub & AI thư ký",
+    title: "Trợ lý ảo cho cộng đồng",
     description:
-      "Thảo luận thật trong cộng đồng; AI tóm tắt và gợi ý đối chiếu văn bản pháp.",
+      "Tối ưu hóa thảo luận cộng đồng bằng AI thư ký. Tóm tắt nội dung chính và gợi ý đối chiếu văn bản pháp luật ngay trong luồng chat.",
     icon: <MessageSquareIcon className="size-4" aria-hidden />,
   },
   {
-    title: "Blog đã kiểm chứng",
+    title: "Kiểm chứng chuyên sâu",
     description:
-      "Bài sâu có nhãn Verified khi đối chiếu được CSDL pháp hiện hành.",
+      "Mọi bài viết trên Blog đều được đối soát với cơ sở dữ liệu pháp luật hiện hành và gắn nhãn Verified bởi chuyên gia.",
     icon: <ShieldCheckIcon className="size-4" aria-hidden />,
   },
   {
-    title: "Tôn vinh đóng góp",
+    title: "Tư duy phản biện công khai",
     description:
-      "Minh bạch tiêu chí, tôn trọng quyền ẩn danh khi phù hợp.",
+      "Khuyến khích đóng góp tri thức với tiêu chí minh bạch. Chúng tôi bảo vệ quyền ẩn danh để đảm bảo tính khách quan trong tranh luận pháp lý.",
     icon: <BookOpenIcon className="size-4" aria-hidden />,
     className: "md:col-span-2",
   },
@@ -95,7 +98,7 @@ function FeatureCardItem({ f }: { f: FeatureCard }) {
   return (
     <div
       className={cn(
-        "group relative h-full overflow-hidden rounded-2xl border border-border bg-card/45 p-6 backdrop-blur-md transition-[border-color,box-shadow] hover:border-primary/25 hover:shadow-[0_0_48px_-16px_oklch(0.55_0.18_285/0.35)] md:p-7"
+        "group relative h-full overflow-hidden rounded-2xl border border-border bg-card/45 p-6 backdrop-blur-md transition-[border-color,box-shadow] hover:border-primary/25 hover:shadow-[0_0_48px_-16px_oklch(0.55_0.18_285/0.35)] md:p-7",
       )}
     >
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/[0.07] via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
@@ -120,14 +123,15 @@ export function FeatureBento() {
     <section className="border-b border-border px-5 py-14 sm:py-16 md:py-20">
       <div className="mx-auto max-w-6xl">
         <div className="mx-auto max-w-reading text-center md:mx-0 md:text-left">
-          <p className="text-[11px] font-semibold uppercase tracking-widest text-primary">
-            Tính năng
+          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary">
+            Hệ sinh thái LawyerAI
           </p>
-          <h2 className="mt-3 font-heading text-3xl font-extrabold tracking-tight sm:text-4xl">
-            Một nơi cho tra cứu, thảo luận và đọc an tâm.
+          <h2 className="mt-3 font-heading text-3xl font-extrabold tracking-tighter sm:text-4xl">
+            Một nền tảng. Mọi nhu cầu tra cứu và thảo luận.
           </h2>
-          <p className="mt-3 text-muted-foreground">
-            Tối giản giao diện, tập trung nội dung có nguồn.
+          <p className="mt-3 text-muted-foreground text-sm">
+            Tối giản trải nghiệm phức tạp, tập trung vào dữ liệu có nguồn xác
+            thực.
           </p>
         </div>
 

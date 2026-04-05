@@ -43,7 +43,9 @@ function formatWhen(iso: string | null): string {
   }
 }
 
-function summaryCopy(status: LawyerVerificationRecord["status"] | null): string {
+function summaryCopy(
+  status: LawyerVerificationRecord["status"] | null,
+): string {
   switch (status) {
     case "PENDING":
       return "Hồ sơ của bạn đang chờ admin xét duyệt. Bạn vẫn có thể cập nhật lại thông tin trước khi có quyết định cuối cùng.";
@@ -63,9 +65,8 @@ export function LawyerVerificationPanel() {
   const hydrated = useAuthStore((s) => s.hydrated);
 
   const [meLoaded, setMeLoaded] = useState(false);
-  const [verification, setVerification] = useState<LawyerVerificationRecord | null>(
-    null,
-  );
+  const [verification, setVerification] =
+    useState<LawyerVerificationRecord | null>(null);
   const [form, setForm] = useState<FormState>(toFormState(null));
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -85,7 +86,9 @@ export function LawyerVerificationPanel() {
         const { user } = await authService.me();
         if (cancelled) return;
         if (!user) {
-          router.replace(`/login?next=${encodeURIComponent("/profile/verification")}`);
+          router.replace(
+            `/login?next=${encodeURIComponent("/profile/verification")}`,
+          );
           return;
         }
         setMeLoaded(true);
@@ -191,7 +194,9 @@ export function LawyerVerificationPanel() {
   }
 
   if (!hydrated || (loading && !meLoaded)) {
-    return <p className="text-sm text-muted-foreground">Đang tải hồ sơ xác minh…</p>;
+    return (
+      <p className="text-sm text-muted-foreground">Đang tải hồ sơ xác minh…</p>
+    );
   }
 
   return (
@@ -221,8 +226,12 @@ export function LawyerVerificationPanel() {
       <section className="rounded-none border border-border bg-card/40 p-5">
         <div className="flex flex-wrap items-center gap-2">
           <ScaleIcon className="size-4 text-primary" aria-hidden />
-          <span className="font-medium text-foreground">Trạng thái xác minh</span>
-          <LawyerVerificationStatusBadge status={verification?.status ?? null} />
+          <span className="font-medium text-foreground">
+            Trạng thái xác minh
+          </span>
+          <LawyerVerificationStatusBadge
+            status={verification?.status ?? null}
+          />
         </div>
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
           {summaryCopy(verification?.status ?? null)}
@@ -265,10 +274,10 @@ export function LawyerVerificationPanel() {
 
       <section className="rounded-none border border-border bg-card/40 p-5">
         <div className="space-y-1">
-          <h2 className="font-medium text-foreground">Thông tin hồ sơ</h2>
+          <h2 className="font-medium text-foreground">Hồ sơ hành nghề</h2>
           <p className="text-sm text-muted-foreground">
-            Jurisdiction và số hành nghề là bắt buộc. Admin sẽ dùng các thông tin
-            này để xác minh thủ công.
+            Khu vực và số thẻ hành nghề là thông tin bắt buộc để hệ thống xác
+            thực tư cách chuyên gia của bạn.
           </p>
         </div>
 
@@ -278,7 +287,7 @@ export function LawyerVerificationPanel() {
               htmlFor="verification-jurisdiction"
               className="text-sm font-medium text-foreground"
             >
-              Jurisdiction
+              Khu vực
             </label>
             <Input
               id="verification-jurisdiction"
@@ -293,7 +302,7 @@ export function LawyerVerificationPanel() {
               htmlFor="verification-bar-number"
               className="text-sm font-medium text-foreground"
             >
-              Số hành nghề
+              Số thẻ hành nghề
             </label>
             <Input
               id="verification-bar-number"
@@ -308,7 +317,7 @@ export function LawyerVerificationPanel() {
               htmlFor="verification-firm-name"
               className="text-sm font-medium text-foreground"
             >
-              Tên tổ chức / văn phòng luật
+              Tên cơ quan / văn phòng
             </label>
             <Input
               id="verification-firm-name"
@@ -325,7 +334,8 @@ export function LawyerVerificationPanel() {
             </Button>
           ) : (
             <div className="rounded-none border border-dashed border-border px-4 py-3 text-sm text-muted-foreground">
-              Hồ sơ ở trạng thái này không thể chỉnh sửa từ giao diện người dùng.
+              Trạng thái hiện tại không cho phép chỉnh sửa. Vui lòng liên hệ hỗ
+              trợ.
             </div>
           )}
         </form>

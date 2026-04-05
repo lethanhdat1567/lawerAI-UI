@@ -7,21 +7,21 @@ export interface NavItem {
 export const siteName = "LawyerAI";
 
 export const mainNavItems: NavItem[] = [
-  { href: "/assistant", label: "Tra cứu" },
-  { href: "/hub", label: "Thảo luận" },
-  { href: "/blog", label: "Blog" },
-  { href: "/contributors", label: "Tôn vinh" },
+  { href: "/assistant", label: "Trợ lý AI" },
+  { href: "/hub", label: "Cộng đồng" },
+  { href: "/blog", label: "Bài viết chuyên sâu" },
+  { href: "/contributors", label: "Vinh danh" },
   { href: "/about", label: "Giới thiệu" },
 ];
 
 export const footerProduct: NavItem[] = [
-  { href: "/assistant", label: "Trợ lý tra cứu" },
-  { href: "/hub", label: "Không gian Hub" },
-  { href: "/blog", label: "Kho tri thức" },
+  { href: "/assistant", label: "Trợ lý AI" },
+  { href: "/hub", label: "Cộng đồng" },
+  { href: "/blog", label: "Bài viết chuyên sâu" },
 ];
 
 export const footerLegal: NavItem[] = [
-  { href: "/privacy", label: "Privacy" },
-  { href: "/terms", label: "Điều khoản" },
-  { href: "/what-is-verified", label: "Verified là gì" },
+  { href: "/privacy", label: "Chính sách bảo mật" },
+  { href: "/terms", label: "Điều khoản sử dụng" },
+  { href: "/what-is-verified", label: "Tiêu chuẩn xác thực" },
 ];

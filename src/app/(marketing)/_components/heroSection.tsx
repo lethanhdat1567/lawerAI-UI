@@ -54,12 +54,12 @@ export function HeroSection() {
           className="mb-10 inline-flex items-center rounded-full border border-border bg-muted/80 p-1 pl-1 shadow-sm backdrop-blur-md dark:border-white/12 dark:bg-white/[0.06] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.04)_inset]"
         >
           <span className="rounded-full bg-primary px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-primary-foreground">
-            Mới
+            Live
           </span>
           <span className="px-2 py-1 text-xs font-medium text-foreground/90 sm:px-3 sm:text-sm dark:text-white/85">
             <span className="sm:hidden">Tra cứu · Hub · Blog</span>
             <span className="hidden sm:inline">
-              Tra cứu có trích dẫn · Hub · Blog đã kiểm chứng
+              Hệ thống tư vấn pháp luật · Cộng đồng · Phân tích thực tiễn
             </span>
           </span>
         </motion.div>
@@ -74,7 +74,7 @@ export function HeroSection() {
             ease: [0.22, 1, 0.36, 1],
           }}
         >
-          Tra cứu pháp lý thông minh, minh bạch và dễ hiểu.
+          Tra cứu pháp lý thông minh, minh bạch và dễ hiểu cùng trợ lý AI.
         </motion.h1>
 
         <motion.p
@@ -87,9 +87,10 @@ export function HeroSection() {
             ease: [0.22, 1, 0.36, 1],
           }}
         >
-          LawyerAI đưa AI pháp lý tới tận tay bạn — tra cứu có nguồn, thảo luận
-          trên Hub và đọc nội dung đã kiểm chứng; luôn là tham khảo, không thay
-          tư vấn luật sư.
+          Trải nghiệm pháp lý thế hệ mới cùng LawyerAI. Truy xuất dữ liệu có
+          trích dẫn, kết nối cộng đồng và cập nhật phân tích chuyên sâu đã qua
+          kiểm chứng. Hệ thống cung cấp thông tin tham khảo, không thay thế tư
+          vấn từ luật sư.
         </motion.p>
 
         <motion.div
@@ -106,14 +107,14 @@ export function HeroSection() {
             href="/assistant"
             className="inline-flex h-12 w-full max-w-[16.5rem] items-center justify-center gap-2 rounded-xl bg-primary px-7 text-sm font-semibold text-primary-foreground shadow-[0_0_40px_-8px_oklch(0.62_0.22_285/0.85)] transition-[transform,box-shadow] hover:scale-[1.02] hover:shadow-[0_0_48px_-6px_oklch(0.68_0.2_285/0.95)] sm:w-auto"
           >
-            Bắt đầu tra cứu
+            Tư vấn cùng trợ lý AI
             <ArrowUpRightIcon className="size-4 shrink-0" aria-hidden />
           </Link>
           <Link
             href="/hub"
             className="inline-flex h-12 w-full max-w-[16.5rem] items-center justify-center rounded-xl border border-border bg-transparent px-7 text-sm font-semibold text-foreground transition-colors hover:bg-muted sm:w-auto dark:border-white/20 dark:text-white dark:hover:border-white/35 dark:hover:bg-white/[0.04]"
           >
-            Mở Hub
+            Khám phá cộng đồng
           </Link>
         </motion.div>
 
@@ -123,7 +124,7 @@ export function HeroSection() {
           animate={reduceMotion ? undefined : { opacity: 1 }}
           transition={{ duration: 0.35, delay: 0.22 }}
         >
-          Miễn phí thử · Không cần thẻ
+          Hoàn toàn miễn phí
         </motion.p>
       </div>
     </section>
