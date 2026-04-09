@@ -104,11 +104,11 @@ export function BlogPostGrid() {
   const itemsIdsKey = items.map((p) => p.id).join(",");
 
   useEffect(() => {
-    if (!hydrated || !signedIn || items.length === 0) {
+    if (!hydrated || !signedIn || itemsIdsKey === "") {
       setEngagementByPostId({});
       return;
     }
-    const ids = items.map((p) => p.id);
+    const ids = itemsIdsKey.split(",").filter(Boolean);
     let cancelled = false;
     void (async () => {
       try {

@@ -11,6 +11,10 @@ export const metadata: Metadata = {
   },
   description:
     "Tra cứu điều luật liên quan, thảo luận cộng đồng với AI thư ký, blog đã kiểm chứng — tham khảo, không thay tư vấn luật sư.",
+  icons: {
+    icon: "/icon.png",
+    apple: "/icon.png",
+  },
 };
 
 interface RootLayoutProps {

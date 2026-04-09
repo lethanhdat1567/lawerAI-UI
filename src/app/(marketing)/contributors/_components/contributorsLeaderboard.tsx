@@ -3,7 +3,6 @@ import Link from "next/link";
 import { BadgeCheckIcon } from "lucide-react";
 
 import type { ContributorRow } from "@/lib/contributors/types";
-import type { ContributorsLeaderboardPeriod } from "@/lib/contributors/fetchLeaderboard";
 import { resolvePublicImageUrl } from "@/lib/media/resolvePublicImageUrl";
 import { userProfilePath } from "@/lib/user/profilePath";
 

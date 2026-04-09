@@ -51,11 +51,11 @@ export function MySavedBlogGrid() {
   const itemsIdsKey = items.map((p) => p.id).join(",");
 
   useEffect(() => {
-    if (items.length === 0) {
+    if (itemsIdsKey === "") {
       setEngagementByPostId({});
       return;
     }
-    const ids = items.map((p) => p.id);
+    const ids = itemsIdsKey.split(",").filter(Boolean);
     let cancelled = false;
     void (async () => {
       try {
