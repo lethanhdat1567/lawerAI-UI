@@ -1,21 +1,18 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import * as Popover from "@radix-ui/react-popover";
+import { Check, ChevronsUpDown } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Select } from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { ApiError } from "@/lib/api/errors";
 import {
+  blogScheduleListModels,
   blogScheduleToggleStatus,
   blogScheduleUpdate,
 } from "@/services/blog-automation/blogScheduleApi";
@@ -39,14 +36,75 @@ export function BlogScheduleSettings({
   onScheduleChange,
 }: BlogScheduleSettingsProps) {
   const [model, setModel] = useState(DEFAULT_SCHEDULE_MODEL);
+  const [isModelPickerOpen, setIsModelPickerOpen] = useState(false);
+  const [modelSearch, setModelSearch] = useState("");
   const [prompt, setPrompt] = useState("");
   const [toggling, setToggling] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [dynamicModels, setDynamicModels] = useState<string[]>([]);
+  const [isLoadingModels, setIsLoadingModels] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadModels() {
+      setIsLoadingModels(true);
+      try {
+        const models = await blogScheduleListModels();
+        if (!isMounted) {
+          return;
+        }
+        setDynamicModels(models);
+      } catch {
+        if (!isMounted) {
+          return;
+        }
+        toast.error("Không tải được danh sách model từ AI Gateway.");
+      } finally {
+        if (isMounted) {
+          setIsLoadingModels(false);
+        }
+      }
+    }
+
+    void loadModels();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const baseModelOptions = useMemo(
+    () =>
+      dynamicModels.length > 0
+        ? dynamicModels.map((value) => ({ value, label: value }))
+        : SCHEDULE_MODEL_OPTIONS,
+    [dynamicModels],
+  );
 
   const modelSelectOptions = useMemo(
-    () => buildScheduleModelSelectOptions(SCHEDULE_MODEL_OPTIONS, schedule?.model),
-    [schedule?.model],
+    () => buildScheduleModelSelectOptions(baseModelOptions, schedule?.model),
+    [baseModelOptions, schedule?.model],
   );
+
+  const filteredModelOptions = useMemo(() => {
+    const keyword = modelSearch.trim().toLowerCase();
+    if (!keyword) {
+      return modelSelectOptions;
+    }
+    return modelSelectOptions.filter(
+      (option) =>
+        option.label.toLowerCase().includes(keyword) ||
+        option.value.toLowerCase().includes(keyword),
+    );
+  }, [modelSearch, modelSelectOptions]);
+
+  const hasNoModelMatch = filteredModelOptions.length === 0;
+  const modelOptionExists = filteredModelOptions.some(
+    (option) => option.value === model,
+  );
+  const selectedModelValue = modelOptionExists
+    ? model
+    : (filteredModelOptions[0]?.value ?? model);
 
   useEffect(() => {
     if (!schedule) {
@@ -113,13 +171,6 @@ export function BlogScheduleSettings({
 
   return (
     <Card className="w-full min-w-0">
-      <CardHeader>
-        <CardTitle>Lịch viết blog tự động</CardTitle>
-        <CardDescription>
-          Bật hoặc tắt tính năng, chọn model và prompt dùng khi hệ thống chạy
-          lịch.
-        </CardDescription>
-      </CardHeader>
       <CardContent className="space-y-6">
         {!schedule ? (
           <p className="rounded-lg border border-border bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
@@ -144,6 +195,7 @@ export function BlogScheduleSettings({
           <Switch
             checked={schedule?.isActive ?? false}
             disabled={!schedule || toggling}
+            className="data-checked:bg-emerald-500 dark:data-checked:bg-emerald-400"
             onCheckedChange={(checked) => void handleToggle(checked)}
           />
         </div>
@@ -158,22 +210,93 @@ export function BlogScheduleSettings({
           {schedule &&
           !SCHEDULE_MODEL_OPTIONS.some((o) => o.value === schedule.model) ? (
             <p className="text-xs text-muted-foreground">
-              Trên DB đang lưu model không nằm trong danh sách chuẩn. Chọn model đúng rồi bấm Lưu để
-              cập nhật.
+              Hãy chọn model mà bạn yêu thích.
             </p>
           ) : null}
-          <Select
-            id="schedule-model"
-            value={model}
-            disabled={!schedule}
-            onChange={(e) => setModel(e.target.value)}
+
+          {isLoadingModels ? (
+            <p className="text-xs text-muted-foreground">
+              Đang tải danh sách model từ AI Gateway...
+            </p>
+          ) : null}
+          {hasNoModelMatch ? (
+            <p className="text-xs text-muted-foreground">
+              Không có model nào khớp với từ khóa tìm kiếm.
+            </p>
+          ) : null}
+          <Popover.Root
+            open={isModelPickerOpen}
+            onOpenChange={(nextOpen) => {
+              setIsModelPickerOpen(nextOpen);
+              if (!nextOpen) {
+                setModelSearch("");
+              }
+            }}
           >
-            {modelSelectOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </Select>
+            <Popover.Trigger asChild>
+              <Button
+                id="schedule-model"
+                type="button"
+                variant="outline"
+                role="combobox"
+                aria-expanded={isModelPickerOpen}
+                disabled={!schedule}
+                className="w-full justify-between"
+              >
+                <span className="truncate">
+                  {modelSelectOptions.find(
+                    (opt) => opt.value === selectedModelValue,
+                  )?.label ?? "Chọn model"}
+                </span>
+                <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-60" />
+              </Button>
+            </Popover.Trigger>
+            <Popover.Portal>
+              <Popover.Content
+                sideOffset={6}
+                align="start"
+                className="z-50 w-(--radix-popover-trigger-width) rounded-lg border bg-popover p-2 shadow-md outline-none"
+              >
+                <Input
+                  autoFocus
+                  value={modelSearch}
+                  onChange={(e) => setModelSearch(e.target.value)}
+                  placeholder="Tìm model..."
+                />
+                <div className="mt-2 max-h-64 overflow-auto">
+                  {hasNoModelMatch ? (
+                    <p className="px-2 py-1.5 text-sm text-muted-foreground">
+                      Không có model nào khớp.
+                    </p>
+                  ) : (
+                    filteredModelOptions.map((opt) => {
+                      const isSelected = model === opt.value;
+                      return (
+                        <Button
+                          key={opt.value}
+                          type="button"
+                          variant="ghost"
+                          className="h-8 w-full justify-start px-2"
+                          onClick={() => {
+                            setModel(opt.value);
+                            setIsModelPickerOpen(false);
+                            setModelSearch("");
+                          }}
+                        >
+                          <Check
+                            className={`mr-2 size-4 ${
+                              isSelected ? "opacity-100" : "opacity-0"
+                            }`}
+                          />
+                          <span className="truncate">{opt.label}</span>
+                        </Button>
+                      );
+                    })
+                  )}
+                </div>
+              </Popover.Content>
+            </Popover.Portal>
+          </Popover.Root>
         </div>
 
         <div className="space-y-2">

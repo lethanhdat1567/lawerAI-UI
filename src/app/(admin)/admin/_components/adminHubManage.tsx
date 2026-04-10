@@ -11,16 +11,19 @@ import {
 import { toast } from "sonner";
 
 import { RichTextEditor } from "@/components/rich-text-editor/richTextEditor";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Sheet,
-  SheetContent,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
 import {
   Table,
   TableBody,
@@ -74,6 +77,7 @@ export function AdminHubManage() {
   const [createBody, setCreateBody] = useState("");
   const [createCategoryId, setCreateCategoryId] = useState("");
   const [createSlug, setCreateSlug] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState<HubPostListItem | null>(null);
 
   const load = useCallback(
     async (targetPage?: number) => {
@@ -106,6 +110,16 @@ export function AdminHubManage() {
   useEffect(() => {
     void load();
   }, [load]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setQ(qDraft);
+      setPage(1);
+    }, 350);
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [qDraft]);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
@@ -177,7 +191,6 @@ export function AdminHubManage() {
   }
 
   async function remove(row: HubPostListItem) {
-    if (!window.confirm(`Xóa mềm bài "${row.title}"?`)) return;
     try {
       await hubAdminDeletePost(row.id);
       toast.success("Đã xóa bài.");
@@ -232,12 +245,6 @@ export function AdminHubManage() {
             <Input
               value={qDraft}
               onChange={(e) => setQDraft(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  setQ(qDraft);
-                  setPage(1);
-                }
-              }}
               placeholder="Tiêu đề, slug, nội dung…"
               className="h-10"
             />
@@ -259,17 +266,6 @@ export function AdminHubManage() {
               <option value="HIDDEN">Ẩn</option>
             </select>
           </div>
-          <Button
-            type="button"
-            variant="secondary"
-            className="h-10"
-            onClick={() => {
-              setQ(qDraft);
-              setPage(1);
-            }}
-          >
-            Lọc
-          </Button>
         </div>
         <Button type="button" className="h-10" onClick={() => setCreateOpen(true)}>
           <PlusIcon className="size-4" aria-hidden />
@@ -340,7 +336,7 @@ export function AdminHubManage() {
                         variant="ghost"
                         size="sm"
                         className="h-8 px-2 text-destructive"
-                        onClick={() => void remove(row)}
+                        onClick={() => setDeleteTarget(row)}
                       >
                         <Trash2Icon className="size-3.5" />
                       </Button>
@@ -384,20 +380,17 @@ export function AdminHubManage() {
         />
       </div>
 
-      <Sheet
+      <AlertDialog
         open={sheetOpen}
         onOpenChange={(o) => {
           setSheetOpen(o);
           if (!o) setEditing(null);
         }}
       >
-        <SheetContent
-          side="right"
-          className="flex w-full max-w-lg flex-col gap-0 sm:max-w-xl"
-        >
-          <SheetHeader className="border-b border-border pb-4">
-            <SheetTitle>Chỉnh sửa Hub (admin)</SheetTitle>
-          </SheetHeader>
+        <AlertDialogContent className="flex max-h-[85vh] w-[min(calc(100vw-2rem),60rem)] max-w-4xl flex-col gap-0 overflow-hidden p-4 sm:p-6">
+          <AlertDialogHeader className="border-b border-border pb-4">
+            <AlertDialogTitle>Chỉnh sửa Hub (admin)</AlertDialogTitle>
+          </AlertDialogHeader>
           <div className="flex-1 space-y-4 overflow-y-auto py-4">
             <div>
               <label className="text-sm font-medium" htmlFor="adm-slug">
@@ -462,25 +455,22 @@ export function AdminHubManage() {
               </div>
             </div>
           </div>
-          <SheetFooter className="border-t border-border pt-4">
+          <AlertDialogFooter className="border-t border-border pt-4">
             <Button variant="secondary" onClick={() => setSheetOpen(false)}>
               Hủy
             </Button>
             <Button disabled={saving} onClick={() => void saveEdit()}>
               {saving ? "Đang lưu…" : "Lưu"}
             </Button>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
-      <Sheet open={createOpen} onOpenChange={setCreateOpen}>
-        <SheetContent
-          side="right"
-          className="flex w-full max-w-lg flex-col gap-0 sm:max-w-xl"
-        >
-          <SheetHeader className="border-b border-border pb-4">
-            <SheetTitle>Tạo bài Hub (admin)</SheetTitle>
-          </SheetHeader>
+      <AlertDialog open={createOpen} onOpenChange={setCreateOpen}>
+        <AlertDialogContent className="flex max-h-[85vh] w-[min(calc(100vw-2rem),60rem)] max-w-4xl flex-col gap-0 overflow-hidden p-4 sm:p-6">
+          <AlertDialogHeader className="border-b border-border pb-4">
+            <AlertDialogTitle>Tạo bài Hub (admin)</AlertDialogTitle>
+          </AlertDialogHeader>
           <div className="flex-1 space-y-4 overflow-y-auto py-4">
             <div>
               <label className="text-sm font-medium" htmlFor="cr-author">
@@ -541,16 +531,49 @@ export function AdminHubManage() {
               </div>
             </div>
           </div>
-          <SheetFooter className="border-t border-border pt-4">
+          <AlertDialogFooter className="border-t border-border pt-4">
             <Button variant="secondary" onClick={() => setCreateOpen(false)}>
               Hủy
             </Button>
             <Button disabled={saving} onClick={() => void createPost()}>
               {saving ? "Đang tạo…" : "Tạo"}
             </Button>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={deleteTarget != null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setDeleteTarget(null);
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xóa bài viết?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {deleteTarget
+                ? `Bài "${deleteTarget.title}" sẽ bị xóa mềm khỏi hệ thống.`
+                : "Bài viết này sẽ bị xóa mềm khỏi hệ thống."}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={saving}>Hủy</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={saving}
+              onClick={() => {
+                if (!deleteTarget) return;
+                void remove(deleteTarget);
+                setDeleteTarget(null);
+              }}
+            >
+              {saving ? "Đang xóa…" : "Xóa bài"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

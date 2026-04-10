@@ -26,7 +26,7 @@ export function AdminAppSidebar() {
 
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader className="border-b border-sidebar-border px-2 py-3">
+      <SidebarHeader className="border-b border-sidebar-border px-2 h-[56px] flex items-start justify-center">
         <Link
           href="/admin"
           className="flex items-center gap-2 rounded-none px-2 py-1 font-heading text-sm font-bold tracking-tight text-sidebar-foreground hover:bg-sidebar-accent"
@@ -46,7 +46,8 @@ export function AdminAppSidebar() {
                 const active =
                   item.href === "/admin"
                     ? pathname === "/admin"
-                    : pathname === item.href || pathname.startsWith(`${item.href}/`);
+                    : pathname === item.href ||
+                      pathname.startsWith(`${item.href}/`);
                 return (
                   <SidebarMenuItem key={item.href}>
                     <SidebarMenuButton
@@ -66,7 +67,10 @@ export function AdminAppSidebar() {
       </SidebarContent>
       <SidebarSeparator />
       <SidebarFooter className="px-2 py-3 text-xs text-sidebar-foreground/60">
-        <Link href="/" className="hover:text-sidebar-foreground hover:underline">
+        <Link
+          href="/"
+          className="hover:text-sidebar-foreground hover:underline"
+        >
           Về trang chủ
         </Link>
       </SidebarFooter>

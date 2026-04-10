@@ -5,8 +5,8 @@ export default function HubCategoriesPage() {
   return (
     <div className="space-y-6">
       <AdminPageHeader
-        title="Hub Categories"
-        description="Quản lý danh mục Hub: tìm kiếm, tạo mới, chỉnh sửa, xóa mềm và phân trang ở giao diện admin."
+        title="Danh mục cộng đồng"
+        description="Quản lý danh sách danh mục cộng đồng của bạn."
       />
       <AdminHubCategoryManage />
     </div>

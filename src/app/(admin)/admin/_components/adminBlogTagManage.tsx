@@ -20,14 +20,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
-import {
   Table,
   TableBody,
   TableCell,
@@ -88,6 +80,16 @@ export function AdminBlogTagManage() {
   useEffect(() => {
     void loadTags();
   }, []);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setQ(qDraft);
+      setPage(1);
+    }, 350);
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [qDraft]);
 
   const filteredTags = useMemo(() => {
     const query = q.trim().toLowerCase();
@@ -221,27 +223,10 @@ export function AdminBlogTagManage() {
             <Input
               value={qDraft}
               onChange={(e) => setQDraft(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  setQ(qDraft);
-                  setPage(1);
-                }
-              }}
               placeholder="Tên tag hoặc slug..."
               className="h-10"
             />
           </div>
-          <Button
-            type="button"
-            variant="secondary"
-            className="h-10"
-            onClick={() => {
-              setQ(qDraft);
-              setPage(1);
-            }}
-          >
-            Lọc
-          </Button>
         </div>
 
         <Button type="button" className="h-10" onClick={openCreate}>
@@ -334,7 +319,7 @@ export function AdminBlogTagManage() {
         />
       </div>
 
-      <Sheet
+      <AlertDialog
         open={sheetOpen}
         onOpenChange={(open) => {
           setSheetOpen(open);
@@ -344,18 +329,15 @@ export function AdminBlogTagManage() {
           }
         }}
       >
-        <SheetContent
-          side="right"
-          className="flex w-full max-w-lg flex-col gap-0 sm:max-w-lg"
-        >
-          <SheetHeader className="border-b border-border pb-4">
-            <SheetTitle>
+        <AlertDialogContent className="flex max-h-[85vh] w-[min(calc(100vw-2rem),48rem)] max-w-2xl flex-col gap-0 overflow-hidden p-4 sm:p-6">
+          <AlertDialogHeader className="border-b border-border pb-4">
+            <AlertDialogTitle>
               {formMode === "create" ? "Tạo Blog tag" : "Sửa Blog tag"}
-            </SheetTitle>
-            <SheetDescription>
+            </AlertDialogTitle>
+            <AlertDialogDescription>
               Tên sẽ tự sinh slug. Bạn vẫn có thể chỉnh slug thủ công trước khi lưu.
-            </SheetDescription>
-          </SheetHeader>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
 
           <div className="flex-1 space-y-4 overflow-y-auto py-4">
             <Field label="Tên tag" required htmlFor="blog-tag-name">
@@ -380,7 +362,7 @@ export function AdminBlogTagManage() {
 
           </div>
 
-          <SheetFooter className="border-t border-border pt-4">
+          <AlertDialogFooter className="border-t border-border pt-4">
             <Button variant="secondary" onClick={() => setSheetOpen(false)}>
               Hủy
             </Button>
@@ -393,9 +375,9 @@ export function AdminBlogTagManage() {
                   ? "Tạo"
                   : "Lưu"}
             </Button>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <AlertDialog
         open={deleteTarget != null}

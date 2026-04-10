@@ -11,8 +11,6 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-import { BlogThumbnailUploadField } from "@/app/(marketing)/blog/_components/blogThumbnailUploadField";
-import { RichTextEditor } from "@/components/rich-text-editor/richTextEditor";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,13 +25,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  Sheet,
-  SheetContent,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
-import {
   Table,
   TableBody,
   TableCell,
@@ -43,34 +34,18 @@ import {
 } from "@/components/ui/table";
 import { Pagination } from "@/components/pagination/pagination";
 import { ApiError } from "@/lib/api/errors";
-import { isHtmlContentEffectivelyEmpty } from "@/lib/editor/plain-excerpt";
 import {
-  blogAdminCreatePost,
   blogAdminDeletePost,
-  blogAdminPatchPost,
   blogAdminPatchPostVerification,
   blogAdminPostById,
   blogAdminPosts,
 } from "@/lib/blog/blogApi";
-import { blogPublicTags } from "@/lib/blog/blogTagApi";
-import type {
-  BlogPostDetail,
-  BlogPostListItem,
-  BlogPostStatusUI,
-  BlogTag,
-} from "@/lib/blog/types";
+import type { BlogPostDetail, BlogPostListItem } from "@/lib/blog/types";
 
 const PAGE_SIZE = 12;
 
 function statusLabel(s: BlogPostListItem["status"]): string {
   return s === "PUBLISHED" ? "Xuất bản" : "Nháp";
-}
-
-function toggleInSet(set: Set<string>, id: string): Set<string> {
-  const n = new Set(set);
-  if (n.has(id)) n.delete(id);
-  else n.add(id);
-  return n;
 }
 
 export function AdminBlogManage() {
@@ -86,19 +61,6 @@ export function AdminBlogManage() {
   const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [authorIdFilter, setAuthorIdFilter] = useState("");
   const [authorIdFilterDraft, setAuthorIdFilterDraft] = useState("");
-  const [tags, setTags] = useState<BlogTag[]>([]);
-  const [sheetOpen, setSheetOpen] = useState(false);
-  const [createOpen, setCreateOpen] = useState(false);
-  const [editing, setEditing] = useState<BlogPostListItem | null>(null);
-  const [editSlug, setEditSlug] = useState("");
-  const [editTitle, setEditTitle] = useState("");
-  const [editExcerpt, setEditExcerpt] = useState("");
-  const [editThumbnailUrl, setEditThumbnailUrl] = useState("");
-  const [editBody, setEditBody] = useState("");
-  const [editStatus, setEditStatus] =
-    useState<BlogPostListItem["status"]>("PUBLISHED");
-  const [editAuthorId, setEditAuthorId] = useState("");
-  const [editTagIds, setEditTagIds] = useState<Set<string>>(new Set());
   const [saving, setSaving] = useState(false);
   const [verificationOpen, setVerificationOpen] = useState(false);
   const [verificationTarget, setVerificationTarget] = useState<BlogPostListItem | null>(
@@ -107,15 +69,7 @@ export function AdminBlogManage() {
   const [verificationNotes, setVerificationNotes] = useState("");
   const [verificationLoading, setVerificationLoading] = useState(false);
   const [verificationSaving, setVerificationSaving] = useState(false);
-  const [createAuthorId, setCreateAuthorId] = useState("");
-  const [createTitle, setCreateTitle] = useState("");
-  const [createBody, setCreateBody] = useState("");
-  const [createSlug, setCreateSlug] = useState("");
-  const [createExcerpt, setCreateExcerpt] = useState("");
-  const [createThumbnailUrl, setCreateThumbnailUrl] = useState("");
-  const [createStatus, setCreateStatus] =
-    useState<BlogPostStatusUI>("PUBLISHED");
-  const [createTagIds, setCreateTagIds] = useState<Set<string>>(new Set());
+  const [deleteTarget, setDeleteTarget] = useState<BlogPostListItem | null>(null);
 
   const load = useCallback(
     async (targetPage?: number) => {
@@ -151,27 +105,23 @@ export function AdminBlogManage() {
     void load();
   }, [load]);
 
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setQ(qDraft);
+      setAuthorIdFilter(authorIdFilterDraft);
+      setPage(1);
+    }, 350);
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [qDraft, authorIdFilterDraft]);
+
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   useEffect(() => {
     const maxPage = Math.max(1, Math.ceil(total / PAGE_SIZE));
     if (page > maxPage) setPage(maxPage);
   }, [total, page]);
-
-  useEffect(() => {
-    let cancelled = false;
-    void (async () => {
-      try {
-        const { tags: t } = await blogPublicTags();
-        if (!cancelled) setTags(t);
-      } catch {
-        /* ignore */
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   function syncRowFromDetail(post: BlogPostDetail) {
     setItems((prev) =>
@@ -197,30 +147,6 @@ export function AdminBlogManage() {
     );
   }
 
-  function openEdit(row: BlogPostListItem) {
-    setEditing(row);
-    setEditSlug(row.slug);
-    setEditTitle(row.title);
-    setEditExcerpt(row.excerpt ?? "");
-    setEditThumbnailUrl(row.thumbnailUrl ?? "");
-    setEditAuthorId(row.author.id);
-    setEditStatus(row.status);
-    setEditTagIds(new Set(row.tags.map((t) => t.id)));
-    setEditBody("");
-    setSheetOpen(true);
-    void (async () => {
-      try {
-        const { post } = await blogAdminPostById(row.id);
-        setEditBody(post.body);
-        setEditThumbnailUrl(post.thumbnailUrl ?? "");
-      } catch {
-        toast.error("Không tải chi tiết bài.");
-        setSheetOpen(false);
-        setEditing(null);
-      }
-    })();
-  }
-
   function openVerification(row: BlogPostListItem) {
     setVerificationTarget(row);
     setVerificationNotes("");
@@ -242,40 +168,6 @@ export function AdminBlogManage() {
     })();
   }
 
-  async function saveEdit() {
-    if (!editing) return;
-    if (!editTitle.trim() || isHtmlContentEffectivelyEmpty(editBody)) {
-      toast.error("Tiêu đề và nội dung bắt buộc.");
-      return;
-    }
-    if (!editAuthorId.trim()) {
-      toast.error("Cần author user id.");
-      return;
-    }
-    setSaving(true);
-    try {
-      const { post } = await blogAdminPatchPost(editing.id, {
-        title: editTitle.trim(),
-        slug: editSlug.trim(),
-        body: editBody,
-        excerpt: editExcerpt.trim() ? editExcerpt.trim() : null,
-        thumbnailUrl: editThumbnailUrl.trim() ? editThumbnailUrl.trim() : null,
-        status: editStatus,
-        authorId: editAuthorId.trim(),
-        tagIds: [...editTagIds],
-      });
-      toast.success("Đã cập nhật.");
-      setItems((prev) => prev.map((x) => (x.id === post.id ? post : x)));
-      setSheetOpen(false);
-      setEditing(null);
-      void load();
-    } catch (e) {
-      toast.error(e instanceof ApiError ? e.message : "Lưu thất bại.");
-    } finally {
-      setSaving(false);
-    }
-  }
-
   async function submitVerification(nextVerified: boolean) {
     if (!verificationTarget) return;
     setVerificationSaving(true);
@@ -287,9 +179,6 @@ export function AdminBlogManage() {
           : null,
       });
       syncRowFromDetail(post);
-      if (editing?.id === post.id) {
-        setEditing((prev) => (prev ? { ...prev, isVerified: post.isVerified } : prev));
-      }
       toast.success(nextVerified ? "Đã verify bài viết." : "Đã hủy verify bài viết.");
       setVerificationOpen(false);
       setVerificationTarget(null);
@@ -304,51 +193,13 @@ export function AdminBlogManage() {
   }
 
   async function remove(row: BlogPostListItem) {
-    if (!window.confirm(`Xóa mềm bài "${row.title}"?`)) return;
+    setSaving(true);
     try {
       await blogAdminDeletePost(row.id);
       toast.success("Đã xóa bài.");
       void load();
     } catch (e) {
       toast.error(e instanceof ApiError ? e.message : "Xóa thất bại.");
-    }
-  }
-
-  async function createPost() {
-    if (!createAuthorId.trim() || !createTitle.trim()) {
-      toast.error("Cần authorId và tiêu đề.");
-      return;
-    }
-    if (isHtmlContentEffectivelyEmpty(createBody)) {
-      toast.error("Nội dung không được để trống.");
-      return;
-    }
-    setSaving(true);
-    try {
-      await blogAdminCreatePost({
-        authorId: createAuthorId.trim(),
-        title: createTitle.trim(),
-        body: createBody,
-        excerpt: createExcerpt.trim() ? createExcerpt.trim() : null,
-        thumbnailUrl: createThumbnailUrl.trim() ? createThumbnailUrl.trim() : null,
-        status: createStatus,
-        slug: createSlug.trim() || undefined,
-        tagIds: [...createTagIds],
-      });
-      toast.success("Đã tạo bài.");
-      setCreateOpen(false);
-      setCreateAuthorId("");
-      setCreateTitle("");
-      setCreateBody("");
-      setCreateSlug("");
-      setCreateExcerpt("");
-      setCreateThumbnailUrl("");
-      setCreateTagIds(new Set());
-      setCreateStatus("PUBLISHED");
-      setPage(1);
-      await load(1);
-    } catch (e) {
-      toast.error(e instanceof ApiError ? e.message : "Tạo bài thất bại.");
     } finally {
       setSaving(false);
     }
@@ -365,12 +216,6 @@ export function AdminBlogManage() {
             <Input
               value={qDraft}
               onChange={(e) => setQDraft(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  setQ(qDraft);
-                  setPage(1);
-                }
-              }}
               placeholder="Tiêu đề, slug, nội dung…"
               className="h-10"
             />
@@ -399,12 +244,6 @@ export function AdminBlogManage() {
             <Input
               value={authorIdFilterDraft}
               onChange={(e) => setAuthorIdFilterDraft(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  setAuthorIdFilter(authorIdFilterDraft);
-                  setPage(1);
-                }
-              }}
               placeholder="Lọc theo tác giả…"
               className="h-10 font-mono text-xs"
             />
@@ -421,20 +260,8 @@ export function AdminBlogManage() {
             />
             Chỉ verified
           </label>
-          <Button
-            type="button"
-            variant="secondary"
-            className="h-10"
-            onClick={() => {
-              setQ(qDraft);
-              setAuthorIdFilter(authorIdFilterDraft);
-              setPage(1);
-            }}
-          >
-            Lọc
-          </Button>
         </div>
-        <Button type="button" className="h-10" onClick={() => setCreateOpen(true)}>
+        <Button type="button" className="h-10" render={<Link href="/blog/new" />}>
           <PlusIcon className="size-4" aria-hidden />
           Bài mới
         </Button>
@@ -514,7 +341,7 @@ export function AdminBlogManage() {
                         variant="ghost"
                         size="sm"
                         className="h-8 px-2"
-                        onClick={() => openEdit(row)}
+                        render={<Link href={`/blog/edit/${row.id}`} />}
                       >
                         Sửa
                       </Button>
@@ -522,7 +349,7 @@ export function AdminBlogManage() {
                         variant="ghost"
                         size="sm"
                         className="h-8 px-2 text-destructive"
-                        onClick={() => void remove(row)}
+                        onClick={() => setDeleteTarget(row)}
                       >
                         <Trash2Icon className="size-3.5" />
                       </Button>
@@ -566,130 +393,6 @@ export function AdminBlogManage() {
           ariaLabel="Phân trang Blog admin"
         />
       </div>
-
-      <Sheet
-        open={sheetOpen}
-        onOpenChange={(o) => {
-          setSheetOpen(o);
-          if (!o) setEditing(null);
-        }}
-      >
-        <SheetContent
-          side="right"
-          className="flex w-full max-w-lg flex-col gap-0 sm:max-w-xl"
-        >
-          <SheetHeader className="border-b border-border pb-4">
-            <SheetTitle>Chỉnh sửa Blog (admin)</SheetTitle>
-          </SheetHeader>
-          <div className="flex-1 space-y-4 overflow-y-auto py-4">
-            <div>
-              <label className="text-sm font-medium" htmlFor="ab-slug">
-                Slug
-              </label>
-              <Input
-                id="ab-slug"
-                value={editSlug}
-                onChange={(e) => setEditSlug(e.target.value)}
-                className="mt-1.5 h-10"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium" htmlFor="ab-title">
-                Tiêu đề
-              </label>
-              <Input
-                id="ab-title"
-                value={editTitle}
-                onChange={(e) => setEditTitle(e.target.value)}
-                className="mt-1.5 h-10"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium" htmlFor="ab-ex">
-                Tóm tắt
-              </label>
-              <textarea
-                id="ab-ex"
-                value={editExcerpt}
-                onChange={(e) => setEditExcerpt(e.target.value)}
-                rows={2}
-                className="mt-1.5 w-full resize-y rounded-lg border border-border bg-background px-3 py-2 text-sm"
-              />
-            </div>
-            <BlogThumbnailUploadField
-              id="ab-thumb"
-              label="Ảnh thumbnail"
-              value={editThumbnailUrl}
-              onChange={setEditThumbnailUrl}
-              disabled={saving}
-            />
-            <div>
-              <label className="text-sm font-medium" htmlFor="ab-author">
-                Author user id (cuid)
-              </label>
-              <Input
-                id="ab-author"
-                value={editAuthorId}
-                onChange={(e) => setEditAuthorId(e.target.value)}
-                className="mt-1.5 h-10 font-mono text-xs"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium" htmlFor="ab-status">
-                Trạng thái
-              </label>
-              <select
-                id="ab-status"
-                value={editStatus}
-                onChange={(e) =>
-                  setEditStatus(e.target.value as BlogPostListItem["status"])
-                }
-                className="mt-1.5 h-10 w-full rounded-lg border border-border bg-background px-3 text-sm"
-              >
-                <option value="PUBLISHED">Xuất bản</option>
-                <option value="DRAFT">Nháp</option>
-              </select>
-            </div>
-            {tags.length > 0 ? (
-              <fieldset className="space-y-2">
-                <legend className="text-sm font-medium">Thẻ</legend>
-                <div className="flex flex-wrap gap-2">
-                  {tags.map((t) => (
-                    <label
-                      key={t.id}
-                      className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-border px-3 py-1.5 text-xs has-checked:border-primary/50 has-checked:bg-primary/10"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={editTagIds.has(t.id)}
-                        onChange={() =>
-                          setEditTagIds((s) => toggleInSet(s, t.id))
-                        }
-                        className="rounded border-border"
-                      />
-                      {t.name}
-                    </label>
-                  ))}
-                </div>
-              </fieldset>
-            ) : null}
-            <div>
-              <p className="text-sm font-medium">Nội dung</p>
-              <div className="mt-1.5 min-h-[200px]">
-                <RichTextEditor value={editBody} onChange={setEditBody} />
-              </div>
-            </div>
-          </div>
-          <SheetFooter className="border-t border-border pt-4">
-            <Button variant="secondary" onClick={() => setSheetOpen(false)}>
-              Hủy
-            </Button>
-            <Button disabled={saving} onClick={() => void saveEdit()}>
-              {saving ? "Đang lưu…" : "Lưu"}
-            </Button>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
 
       <AlertDialog
         open={verificationOpen}
@@ -755,124 +458,38 @@ export function AdminBlogManage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      <Sheet open={createOpen} onOpenChange={setCreateOpen}>
-        <SheetContent
-          side="right"
-          className="flex w-full max-w-lg flex-col gap-0 sm:max-w-xl"
-        >
-          <SheetHeader className="border-b border-border pb-4">
-            <SheetTitle>Tạo bài Blog (admin)</SheetTitle>
-          </SheetHeader>
-          <div className="flex-1 space-y-4 overflow-y-auto py-4">
-            <div>
-              <label className="text-sm font-medium" htmlFor="bc-author">
-                Author user id (cuid)
-              </label>
-              <Input
-                id="bc-author"
-                value={createAuthorId}
-                onChange={(e) => setCreateAuthorId(e.target.value)}
-                className="mt-1.5 h-10 font-mono text-xs"
-                placeholder="clx…"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium" htmlFor="bc-slug">
-                Slug (tuỳ chọn)
-              </label>
-              <Input
-                id="bc-slug"
-                value={createSlug}
-                onChange={(e) => setCreateSlug(e.target.value)}
-                className="mt-1.5 h-10"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium" htmlFor="bc-title">
-                Tiêu đề
-              </label>
-              <Input
-                id="bc-title"
-                value={createTitle}
-                onChange={(e) => setCreateTitle(e.target.value)}
-                className="mt-1.5 h-10"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium" htmlFor="bc-ex">
-                Tóm tắt (tuỳ chọn)
-              </label>
-              <textarea
-                id="bc-ex"
-                value={createExcerpt}
-                onChange={(e) => setCreateExcerpt(e.target.value)}
-                rows={2}
-                className="mt-1.5 w-full resize-y rounded-lg border border-border bg-background px-3 py-2 text-sm"
-              />
-            </div>
-            <BlogThumbnailUploadField
-              id="bc-thumb"
-              label="Ảnh thumbnail (tuỳ chọn)"
-              value={createThumbnailUrl}
-              onChange={setCreateThumbnailUrl}
+      <AlertDialog
+        open={deleteTarget != null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setDeleteTarget(null);
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xóa bài viết?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {deleteTarget
+                ? `Bài "${deleteTarget.title}" sẽ bị xóa mềm khỏi hệ thống.`
+                : "Bài viết này sẽ bị xóa mềm khỏi hệ thống."}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={saving}>Hủy</AlertDialogCancel>
+            <AlertDialogAction
               disabled={saving}
-            />
-            <div>
-              <label className="text-sm font-medium" htmlFor="bc-status">
-                Trạng thái
-              </label>
-              <select
-                id="bc-status"
-                value={createStatus}
-                onChange={(e) =>
-                  setCreateStatus(e.target.value as BlogPostStatusUI)
-                }
-                className="mt-1.5 h-10 w-full rounded-lg border border-border bg-background px-3 text-sm"
-              >
-                <option value="PUBLISHED">Xuất bản</option>
-                <option value="DRAFT">Nháp</option>
-              </select>
-            </div>
-            {tags.length > 0 ? (
-              <fieldset className="space-y-2">
-                <legend className="text-sm font-medium">Thẻ</legend>
-                <div className="flex flex-wrap gap-2">
-                  {tags.map((t) => (
-                    <label
-                      key={t.id}
-                      className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-border px-3 py-1.5 text-xs has-checked:border-primary/50 has-checked:bg-primary/10"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={createTagIds.has(t.id)}
-                        onChange={() =>
-                          setCreateTagIds((s) => toggleInSet(s, t.id))
-                        }
-                        className="rounded border-border"
-                      />
-                      {t.name}
-                    </label>
-                  ))}
-                </div>
-              </fieldset>
-            ) : null}
-            <div>
-              <p className="text-sm font-medium">Nội dung</p>
-              <div className="mt-1.5 min-h-[200px]">
-                <RichTextEditor value={createBody} onChange={setCreateBody} />
-              </div>
-            </div>
-          </div>
-          <SheetFooter className="border-t border-border pt-4">
-            <Button variant="secondary" onClick={() => setCreateOpen(false)}>
-              Hủy
-            </Button>
-            <Button disabled={saving} onClick={() => void createPost()}>
-              {saving ? "Đang tạo…" : "Tạo"}
-            </Button>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
+              onClick={() => {
+                if (!deleteTarget) return;
+                void remove(deleteTarget);
+                setDeleteTarget(null);
+              }}
+            >
+              {saving ? "Đang xóa…" : "Xóa bài"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

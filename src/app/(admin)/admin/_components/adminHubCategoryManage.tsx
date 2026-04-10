@@ -9,8 +9,6 @@ import { toast } from "sonner";
 import { Pagination } from "@/components/pagination/pagination";
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -19,14 +17,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
 import {
   Table,
   TableBody,
@@ -94,6 +84,17 @@ export function AdminHubCategoryManage() {
   useEffect(() => {
     void loadCategories();
   }, []);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setQ(qDraft);
+      setPage(1);
+    }, 350);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [qDraft]);
 
   const filteredCategories = useMemo(() => {
     const query = q.trim().toLowerCase();
@@ -238,27 +239,10 @@ export function AdminHubCategoryManage() {
             <Input
               value={qDraft}
               onChange={(e) => setQDraft(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  setQ(qDraft);
-                  setPage(1);
-                }
-              }}
               placeholder="Tên category hoặc slug..."
               className="h-10"
             />
           </div>
-          <Button
-            type="button"
-            variant="secondary"
-            className="h-10"
-            onClick={() => {
-              setQ(qDraft);
-              setPage(1);
-            }}
-          >
-            Lọc
-          </Button>
         </div>
 
         <Button type="button" className="h-10" onClick={openCreate}>
@@ -355,7 +339,7 @@ export function AdminHubCategoryManage() {
         />
       </div>
 
-      <Sheet
+      <AlertDialog
         open={sheetOpen}
         onOpenChange={(open) => {
           setSheetOpen(open);
@@ -365,18 +349,15 @@ export function AdminHubCategoryManage() {
           }
         }}
       >
-        <SheetContent
-          side="right"
-          className="flex w-full max-w-lg flex-col gap-0 sm:max-w-lg"
-        >
-          <SheetHeader className="border-b border-border pb-4">
-            <SheetTitle>
+        <AlertDialogContent className="flex w-[min(calc(100vw-2rem),48rem)] max-w-2xl flex-col gap-0 p-4 sm:p-6">
+          <AlertDialogHeader className="border-b border-border pb-4">
+            <AlertDialogTitle>
               {formMode === "create" ? "Tạo Hub category" : "Sửa Hub category"}
-            </SheetTitle>
-            <SheetDescription>
+            </AlertDialogTitle>
+            <AlertDialogDescription>
               Tên sẽ tự sinh slug bằng `slugify`. Bạn vẫn có thể chỉnh slug thủ công.
-            </SheetDescription>
-          </SheetHeader>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
 
           <div className="flex-1 space-y-4 overflow-y-auto py-4">
             <Field label="Tên category" required htmlFor="hub-category-name">
@@ -411,7 +392,7 @@ export function AdminHubCategoryManage() {
             </Field>
           </div>
 
-          <SheetFooter className="border-t border-border pt-4">
+          <AlertDialogFooter className="border-t border-border pt-4">
             <Button variant="secondary" onClick={() => setSheetOpen(false)}>
               Hủy
             </Button>
@@ -424,9 +405,9 @@ export function AdminHubCategoryManage() {
                   ? "Tạo"
                   : "Lưu"}
             </Button>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <AlertDialog
         open={deleteTarget != null}
@@ -444,13 +425,20 @@ export function AdminHubCategoryManage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={saving}>Hủy</AlertDialogCancel>
-            <AlertDialogAction
+            <Button
+              variant="outline"
               disabled={saving}
+              onClick={() => setDeleteTarget(null)}
+            >
+              Hủy
+            </Button>
+            <Button
+              disabled={saving}
+              variant="destructive"
               onClick={() => void confirmDelete()}
             >
               {saving ? "Đang xóa..." : "Xóa category"}
-            </AlertDialogAction>
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

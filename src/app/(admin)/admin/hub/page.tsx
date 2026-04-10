@@ -6,8 +6,8 @@ export default function AdminHubPage() {
   return (
     <div className="space-y-6">
       <AdminPageHeader
-        title="Hub"
-        description="HubPost — PUBLISHED / HIDDEN; danh sách, chỉnh sửa, tạo và xóa mềm qua LawyerAI-api (quyền ADMIN)."
+        title="Cộng đồng"
+        description="Quản lý danh sách bài viết cộng đồng của bạn."
       />
       <AdminHubManage />
     </div>

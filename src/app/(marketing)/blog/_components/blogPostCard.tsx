@@ -36,6 +36,7 @@ export function BlogPostCard({
   variant?: "default" | "onProfile";
 }) {
   const thumbSrc = resolveApiAssetUrl(post.thumbnailUrl);
+  const authorAvatarSrc = resolveApiAssetUrl(post.author.avatarUrl);
   const authorProfileHref = userProfilePath(post.author.username);
   const onProfile = variant === "onProfile";
 
@@ -151,10 +152,19 @@ export function BlogPostCard({
             href={authorProfileHref}
             className="flex min-w-0 items-center gap-2 rounded-lg outline-none transition-colors hover:text-primary focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
-            <span className="flex size-7 shrink-0 items-center justify-center rounded-full border border-border bg-primary/15 text-[11px] font-bold text-primary">
-              {(post.author.displayName ?? post.author.username)
-                .slice(0, 1)
-                .toUpperCase()}
+            <span className="flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-primary/15 text-[11px] font-bold text-primary">
+              {authorAvatarSrc ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={authorAvatarSrc}
+                  alt={post.author.displayName ?? post.author.username}
+                  className="size-full object-cover"
+                />
+              ) : (
+                (post.author.displayName ?? post.author.username)
+                  .slice(0, 1)
+                  .toUpperCase()
+              )}
             </span>
             <span className="truncate text-xs font-medium text-foreground/90 sm:text-sm">
               {post.author.displayName ?? post.author.username}

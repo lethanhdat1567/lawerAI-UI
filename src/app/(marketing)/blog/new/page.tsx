@@ -18,7 +18,7 @@ const BlogNewPostFormLazy = dynamic(
 
 export default function BlogNewPostPage() {
   return (
-    <div className="mx-auto max-w-3xl px-5 py-10 sm:py-14 md:py-16">
+    <div className="mx-auto max-w-4xl px-5 py-10 sm:py-14 md:py-16">
       <Link
         href="/my/blog"
         className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-primary"

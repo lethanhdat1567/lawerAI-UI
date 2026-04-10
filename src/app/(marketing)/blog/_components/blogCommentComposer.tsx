@@ -68,7 +68,10 @@ export function BlogCommentComposer({ postId }: { postId: string }) {
       onSubmit={(e) => void handleSubmit(e)}
       className="rounded-2xl border border-border bg-card/40 p-5 backdrop-blur-md"
     >
-      <label htmlFor="blog-comment" className="text-sm font-semibold text-foreground">
+      <label
+        htmlFor="blog-comment"
+        className="text-sm font-semibold text-foreground"
+      >
         Viết bình luận
       </label>
       <textarea
@@ -83,7 +86,7 @@ export function BlogCommentComposer({ postId }: { postId: string }) {
         <button
           type="submit"
           disabled={submitting}
-          className="inline-flex h-10 items-center justify-center rounded-xl bg-primary px-5 text-sm font-semibold text-primary-foreground disabled:opacity-50"
+          className="inline-flex cursor-pointer! h-10 items-center justify-center rounded-xl bg-primary px-5 text-sm font-semibold text-primary-foreground disabled:opacity-50"
         >
           {submitting ? "Đang gửi…" : "Gửi"}
         </button>

@@ -15,11 +15,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Pagination } from "@/components/pagination/pagination";
 import { ApiError } from "@/lib/api/errors";
 import {
@@ -36,6 +36,21 @@ function formatWhen(iso: string): string {
     return new Date(iso).toLocaleString("vi-VN");
   } catch {
     return iso;
+  }
+}
+
+function getStatusLabel(status: string): string {
+  switch (status) {
+    case "PENDING":
+      return "Chờ duyệt";
+    case "APPROVED":
+      return "Đã duyệt";
+    case "REJECTED":
+      return "Đã từ chối";
+    case "REVOKED":
+      return "Đã thu hồi";
+    default:
+      return status;
   }
 }
 
@@ -70,10 +85,7 @@ export function AdminVerificationsManage() {
     void load();
   }, [load]);
 
-  async function act(
-    id: string,
-    status: "APPROVED" | "REJECTED" | "REVOKED",
-  ) {
+  async function act(id: string, status: "APPROVED" | "REJECTED" | "REVOKED") {
     setActing(true);
     try {
       await adminPatchLawyerVerification(id, {
@@ -94,22 +106,22 @@ export function AdminVerificationsManage() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap gap-2">
-        {(["", "PENDING", "APPROVED", "REJECTED", "REVOKED"] as StatusTab[]).map(
-          (s) => (
-            <Button
-              key={s || "all"}
-              type="button"
-              size="sm"
-              variant={statusTab === s ? "default" : "outline"}
-              onClick={() => {
-                setStatusTab(s);
-                setPage(1);
-              }}
-            >
-              {s === "" ? "Tất cả" : s}
-            </Button>
-          ),
-        )}
+        {(
+          ["", "PENDING", "APPROVED", "REJECTED", "REVOKED"] as StatusTab[]
+        ).map((s) => (
+          <Button
+            key={s || "all"}
+            type="button"
+            size="sm"
+            variant={statusTab === s ? "default" : "outline"}
+            onClick={() => {
+              setStatusTab(s);
+              setPage(1);
+            }}
+          >
+            {s === "" ? "Tất cả" : getStatusLabel(s)}
+          </Button>
+        ))}
       </div>
 
       <div className="rounded-md border">
@@ -142,8 +154,10 @@ export function AdminVerificationsManage() {
                       @{row.user.username ?? "—"}
                     </div>
                   </TableCell>
-                  <TableCell>{row.status}</TableCell>
-                  <TableCell className="text-sm">{formatWhen(row.createdAt)}</TableCell>
+                  <TableCell>{getStatusLabel(row.status)}</TableCell>
+                  <TableCell className="text-sm">
+                    {formatWhen(row.createdAt)}
+                  </TableCell>
                   <TableCell>
                     <Button
                       type="button"
@@ -171,40 +185,45 @@ export function AdminVerificationsManage() {
         ariaLabel="Phân trang xác minh"
       />
 
-      <Sheet
+      <AlertDialog
         open={detail != null}
         onOpenChange={(open) => {
           if (!open) setDetail(null);
         }}
       >
-        <SheetContent className="flex w-full flex-col gap-4 sm:max-w-lg">
-          <SheetHeader>
-            <SheetTitle>Xác minh luật sư</SheetTitle>
-          </SheetHeader>
+        <AlertDialogContent className="flex w-[min(calc(100vw-2rem),42rem)] max-w-2xl flex-col gap-4 p-4 sm:p-6">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xác minh luật sư</AlertDialogTitle>
+          </AlertDialogHeader>
           {detail ? (
-            <div className="flex flex-1 flex-col gap-3 overflow-y-auto text-sm">
+            <div className="flex max-h-[70vh] flex-1 flex-col gap-3 overflow-y-auto pr-1 text-sm">
               <p>
-                <span className="text-muted-foreground">User:</span>{" "}
+                <span className="text-muted-foreground">Người dùng:</span>{" "}
                 {detail.user.email}
               </p>
               <p>
                 <span className="text-muted-foreground">Trạng thái:</span>{" "}
-                {detail.status}
+                {getStatusLabel(detail.status)}
               </p>
               <p>
-                <span className="text-muted-foreground">Jurisdiction:</span>{" "}
+                <span className="text-muted-foreground">
+                  Khu vực hành nghề:
+                </span>{" "}
                 {detail.jurisdiction ?? "—"}
               </p>
               <p>
-                <span className="text-muted-foreground">Bar #:</span>{" "}
+                <span className="text-muted-foreground">Số thẻ luật sư:</span>{" "}
                 {detail.barNumber ?? "—"}
               </p>
               <p>
-                <span className="text-muted-foreground">Firm:</span>{" "}
+                <span className="text-muted-foreground">Công ty luật:</span>{" "}
                 {detail.firmName ?? "—"}
               </p>
               <div className="space-y-1">
-                <label htmlFor="ver-note" className="text-xs text-muted-foreground">
+                <label
+                  htmlFor="ver-note"
+                  className="text-xs text-muted-foreground"
+                >
                   Ghi chú (tùy chọn)
                 </label>
                 <Input
@@ -235,20 +254,30 @@ export function AdminVerificationsManage() {
                   </>
                 ) : null}
                 {detail.status === "APPROVED" ? (
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    disabled={acting}
-                    onClick={() => void act(detail.id, "REVOKED")}
-                  >
-                    Thu hồi
-                  </Button>
+                  <>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      disabled={acting}
+                      onClick={() => setDetail(null)}
+                    >
+                      Hủy
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      disabled={acting}
+                      onClick={() => void act(detail.id, "REVOKED")}
+                    >
+                      Thu hồi
+                    </Button>
+                  </>
                 ) : null}
               </div>
             </div>
           ) : null}
-        </SheetContent>
-      </Sheet>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

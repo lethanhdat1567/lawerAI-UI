@@ -5,7 +5,7 @@ export default function AdminCrawlPage() {
   return (
     <div className="space-y-6">
       <AdminPageHeader
-        title="Số hóa dữ liệu"
+        title="Thu thập dữ liệu"
         description="Thu thập nội dung từ URL, biên tập định dạng và đồng bộ hệ thống."
       />
       <AdminCrawlManage />

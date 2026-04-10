@@ -17,6 +17,7 @@ function formatDate(iso: string): string {
 export function BlogPostDetailHeader({ post }: { post: BlogPostDetail }) {
   const firstTag = post.tags[0];
   const coverSrc = resolveApiAssetUrl(post.thumbnailUrl);
+  const authorAvatarSrc = resolveApiAssetUrl(post.author.avatarUrl);
 
   return (
     <header className="border-b border-border pb-8">
@@ -87,10 +88,19 @@ export function BlogPostDetailHeader({ post }: { post: BlogPostDetail }) {
           href={userProfilePath(post.author.username)}
           className="flex items-center gap-2 rounded-lg outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
-          <span className="flex size-9 items-center justify-center rounded-full border border-border bg-primary/15 text-sm font-bold text-primary">
-            {(post.author.displayName ?? post.author.username)
-              .slice(0, 1)
-              .toUpperCase()}
+          <span className="flex size-9 items-center justify-center overflow-hidden rounded-full border border-border bg-primary/15 text-sm font-bold text-primary">
+            {authorAvatarSrc ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={authorAvatarSrc}
+                alt={post.author.displayName ?? post.author.username}
+                className="size-full object-cover"
+              />
+            ) : (
+              (post.author.displayName ?? post.author.username)
+                .slice(0, 1)
+                .toUpperCase()
+            )}
           </span>
           <span className="font-medium text-foreground/90">
             {post.author.displayName ?? post.author.username}

@@ -5,8 +5,8 @@ export default function AdminBlogPage() {
   return (
     <div className="space-y-6">
       <AdminPageHeader
-        title="Blog"
-        description="BlogPost — DRAFT / PUBLISHED; kiểm chứng nội dung (verified), legal corpus; CRUD đầy đủ."
+        title="Bài viết"
+        description="Quản lý danh sách bài viết của bạn."
       />
       <AdminBlogManage />
     </div>

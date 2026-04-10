@@ -100,14 +100,14 @@ export function AdminAiPromptsForm() {
                   htmlFor="ai-prompt-advisor"
                   className="text-sm font-medium text-foreground"
                 >
-                  Prompt trợ lý tư vấn (chat advisor)
+                  Prompt trợ lý tư vấn
                 </label>
                 <Textarea
                   id="ai-prompt-advisor"
                   value={advisorPrompt}
                   onChange={(e) => setAdvisorPrompt(e.target.value)}
                   rows={8}
-                  className="min-h-40 font-mono text-sm"
+                  className="min-h-100 font-mono text-sm"
                   disabled={saving}
                 />
               </div>
@@ -124,7 +124,7 @@ export function AdminAiPromptsForm() {
                   value={communityPrompt}
                   onChange={(e) => setCommunityPrompt(e.target.value)}
                   rows={8}
-                  className="min-h-40 font-mono text-sm"
+                  className="min-h-100 font-mono text-sm"
                   disabled={saving}
                 />
               </div>
@@ -141,7 +141,7 @@ export function AdminAiPromptsForm() {
                   value={blogPrompt}
                   onChange={(e) => setBlogPrompt(e.target.value)}
                   rows={8}
-                  className="min-h-40 font-mono text-sm"
+                  className="min-h-100 font-mono text-sm"
                   disabled={saving}
                 />
               </div>
@@ -156,14 +156,6 @@ export function AdminAiPromptsForm() {
                     <Loader2Icon className="mr-2 size-4 animate-spin" />
                   ) : null}
                   Lưu
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  disabled={loading || saving}
-                  onClick={() => void load()}
-                >
-                  Tải lại
                 </Button>
               </div>
             </>

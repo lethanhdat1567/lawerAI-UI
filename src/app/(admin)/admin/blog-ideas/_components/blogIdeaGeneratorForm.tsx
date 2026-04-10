@@ -4,7 +4,13 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ApiError } from "@/lib/api/errors";
 import { blogIdeaCreate } from "@/services/blog-automation/blogIdeaApi";
@@ -29,7 +35,9 @@ export function BlogIdeaGeneratorForm({
       return;
     }
     if (!scheduleReady) {
-      toast.error("Hãy cấu hình lịch hệ thống (model và prompt) ở phần trên trước.");
+      toast.error(
+        "Hãy cấu hình lịch hệ thống (model và prompt) ở phần trên trước.",
+      );
       return;
     }
     setSubmitting(true);
@@ -49,18 +57,21 @@ export function BlogIdeaGeneratorForm({
       <CardHeader>
         <CardTitle>Tạo ý tưởng bằng AI</CardTitle>
         <CardDescription>
-          Chủ đề và model lấy từ cấu hình &quot;Lịch viết blog tự động&quot; phía trên. Chỉ cần chọn
-          số lượng ý tưởng cần sinh.
+          Hãy tạo những ý tưởng để AI có thể dựa vào đó và viết blog.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {!scheduleReady ? (
           <p className="text-sm text-muted-foreground">
-            Cần có bản ghi lịch hệ thống với model và prompt đã lưu trước khi tạo ý tưởng.
+            Cần có bản ghi lịch hệ thống với model và prompt đã lưu trước khi
+            tạo ý tưởng.
           </p>
         ) : null}
         <div className="space-y-2">
-          <label htmlFor="idea-qty" className="text-sm font-medium text-foreground">
+          <label
+            htmlFor="idea-qty"
+            className="text-sm font-medium text-foreground"
+          >
             Số lượng ý tưởng
           </label>
           <Input

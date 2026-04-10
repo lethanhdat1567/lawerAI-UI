@@ -6,7 +6,7 @@ export default function AdminVerificationsPage() {
     <div className="space-y-6">
       <AdminPageHeader
         title="Xác minh luật sư"
-        description="LawyerVerification — duyệt / từ chối / thu hồi; cập nhật vai trò VERIFIED_LAWYER khi duyệt."
+        description="Hệ thống phê duyệt hồ sơ luật sư và kiểm soát quyền truy cập tài khoản."
       />
       <AdminVerificationsManage />
     </div>

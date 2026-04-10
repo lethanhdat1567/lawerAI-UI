@@ -6,7 +6,7 @@ export default function AdminLeaderboardPage() {
     <div className="space-y-6">
       <AdminPageHeader
         title="Bảng xếp hạng"
-        description="UserContributionScore — điểm đóng góp (admin xem kèm email)."
+        description="Quản lý bảng xếp hạng của người dùng."
       />
       <AdminLeaderboardManage />
     </div>

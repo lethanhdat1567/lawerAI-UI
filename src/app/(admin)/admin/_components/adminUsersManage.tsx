@@ -4,7 +4,6 @@ import { useCallback, useEffect, useState } from "react";
 import { Loader2Icon } from "lucide-react";
 import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -57,7 +56,9 @@ export function AdminUsersManage() {
       setItems(res.items);
       setTotal(res.total);
     } catch (e) {
-      toast.error(e instanceof ApiError ? e.message : "Không tải được danh sách.");
+      toast.error(
+        e instanceof ApiError ? e.message : "Không tải được danh sách.",
+      );
     } finally {
       setLoading(false);
     }
@@ -84,8 +85,11 @@ export function AdminUsersManage() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-end gap-3">
-        <div className="space-y-1">
-          <label htmlFor="admin-users-q" className="text-xs text-muted-foreground">
+        <div className="space-y-1 flex flex-col">
+          <label
+            htmlFor="admin-users-q"
+            className="text-xs text-muted-foreground"
+          >
             Tìm email / username
           </label>
           <Input
@@ -122,17 +126,6 @@ export function AdminUsersManage() {
             ))}
           </select>
         </div>
-        <Button
-          type="button"
-          variant="secondary"
-          size="sm"
-          onClick={() => {
-            setQ(qDraft);
-            setPage(1);
-          }}
-        >
-          Lọc
-        </Button>
       </div>
 
       <div className="rounded-md border">

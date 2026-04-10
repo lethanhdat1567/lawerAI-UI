@@ -7,7 +7,7 @@ export default function AdminUsersPage() {
     <div className="space-y-6">
       <AdminPageHeader
         title="Người dùng"
-        description="User + Profile — phân quyền USER / VERIFIED_LAWYER / ADMIN (schema Prisma)."
+        description="Quản lý danh sách người dùng cùng quyền hạn của họ."
       />
       <AdminUsersManage />
     </div>
