@@ -1,5 +1,6 @@
 "use client";
 
+import { motion, useReducedMotion } from "framer-motion";
 import { useTheme } from "next-themes";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
@@ -24,45 +25,72 @@ export function AssistantMarkdownBlock({
   isStreaming,
   showStreamingCursor,
 }: AssistantMarkdownBlockProps) {
-  const [isChunkAnimating, setIsChunkAnimating] = useState(false);
-
-  useEffect(() => {
-    if (!content || !isStreaming) {
-      setIsChunkAnimating(false);
-      return;
-    }
-
-    setIsChunkAnimating(true);
-
-    const timeoutId = window.setTimeout(() => {
-      setIsChunkAnimating(false);
-    }, 180);
-
-    return () => window.clearTimeout(timeoutId);
-  }, [content, isStreaming]);
+  const reduceMotion = useReducedMotion();
+  const showTypingPlaceholder = !content && isStreaming;
 
   return (
-    <div
-      className={cn(
-        "max-w-3xl text-sm leading-7 text-slate-800 transition-all duration-200 dark:text-slate-200",
-        isChunkAnimating && "translate-y-0.5 opacity-90",
-      )}
-    >
+    <div className="max-w-3xl text-sm leading-7 text-slate-800 dark:text-slate-200">
       {content ? (
         <Markdown components={markdownComponents} remarkPlugins={[remarkGfm]}>
           {content}
         </Markdown>
+      ) : showTypingPlaceholder ? (
+        <TypingIndicator reduceMotion={Boolean(reduceMotion)} />
       ) : (
         <p className="text-slate-500 dark:text-slate-400">Đang trả lời</p>
       )}
-      {showStreamingCursor ? <StreamingCursor /> : null}
+      {showStreamingCursor ? <StreamingCursor reduceMotion={Boolean(reduceMotion)} /> : null}
     </div>
   );
 }
 
-function StreamingCursor() {
+function TypingIndicator({ reduceMotion }: { reduceMotion: boolean }) {
+  if (reduceMotion) {
+    return (
+      <p className="text-slate-500 dark:text-slate-400">
+        Đang trả lời
+        <span className="sr-only">, vui lòng chờ.</span>
+      </p>
+    );
+  }
+
   return (
-    <span className="ml-1 inline-block h-5 w-px animate-pulse bg-current align-middle" />
+    <p className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+      <span className="sr-only">Đang trả lời, vui lòng chờ.</span>
+      <span aria-hidden className="inline-flex items-center gap-1">
+        {[0, 1, 2].map((i) => (
+          <motion.span
+            key={i}
+            animate={{ opacity: [0.25, 1, 0.25], y: [0, -3, 0] }}
+            className="size-1.5 rounded-full bg-slate-400 dark:bg-slate-500"
+            transition={{
+              duration: 0.9,
+              repeat: Infinity,
+              delay: i * 0.14,
+              ease: "easeInOut",
+            }}
+          />
+        ))}
+      </span>
+    </p>
+  );
+}
+
+function StreamingCursor({ reduceMotion }: { reduceMotion: boolean }) {
+  if (reduceMotion) {
+    return (
+      <span
+        aria-hidden
+        className="ml-1 inline-block h-4 w-px bg-current align-middle opacity-80"
+      />
+    );
+  }
+
+  return (
+    <span
+      aria-hidden
+      className="assistant-stream-cursor ml-1 inline-block h-4 w-[3px] shrink-0 rounded-full align-middle"
+    />
   );
 }
 

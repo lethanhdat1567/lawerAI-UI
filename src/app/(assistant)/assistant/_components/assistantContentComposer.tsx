@@ -1,12 +1,13 @@
 "use client";
 
-import { SendHorizontal } from "lucide-react";
+import { Loader2, SendHorizontal } from "lucide-react";
 import type { ChangeEvent, FormEvent, KeyboardEvent } from "react";
 import { useEffect, useRef } from "react";
 
 import { Button } from "@/components/ui/button";
 
 import type { AssistantContentProps } from "@/app/(assistant)/assistant/_components/assistantContent.types";
+import { cn } from "@/lib/utils";
 
 type AssistantContentComposerProps = Pick<
   AssistantContentProps,
@@ -96,7 +97,13 @@ export function AssistantContentComposer({
         className="mx-auto flex w-full max-w-4xl flex-col gap-1.5 sm:gap-2"
         onSubmit={handleSubmit}
       >
-        <div className="border border-black/5 bg-white dark:border-white/10 dark:bg-white/3">
+        <div
+          className={cn(
+            "border border-black/5 bg-white transition-[border-color,box-shadow] duration-300 dark:border-white/10 dark:bg-white/3",
+            isSendingMessage &&
+              "border-violet-500/40 shadow-[0_0_0_1px_oklch(0.58_0.22_285/0.2),0_8px_28px_-8px_oklch(0.58_0.22_285/0.12)] dark:border-violet-400/35 dark:shadow-[0_0_0_1px_oklch(0.72_0.18_285/0.22),0_8px_28px_-8px_oklch(0.72_0.18_285/0.1)]",
+          )}
+        >
           <textarea
             ref={textareaRef}
             rows={1}
@@ -119,12 +126,19 @@ export function AssistantContentComposer({
             disabled={isSubmitDisabled}
             type="submit"
           >
-            <SendHorizontal className="size-3.5 sm:size-4" />
+            {isSendingMessage ? (
+              <Loader2
+                aria-hidden
+                className="size-3.5 shrink-0 animate-spin sm:size-4"
+              />
+            ) : (
+              <SendHorizontal className="size-3.5 sm:size-4" />
+            )}
             <span className="hidden sm:inline">
-              {isSendingMessage ? "Đang gửi..." : "Gửi tin nhắn"}
+              {isSendingMessage ? "Đang trả lời…" : "Gửi tin nhắn"}
             </span>
             <span className="sm:hidden">
-              {isSendingMessage ? "..." : "Gửi"}
+              {isSendingMessage ? "…" : "Gửi"}
             </span>
           </Button>
         </div>
