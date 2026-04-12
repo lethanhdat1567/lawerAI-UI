@@ -1,16 +1,11 @@
 "use client";
 
+import { AlertCircle, Loader2, Sparkles } from "lucide-react";
 import type { ReactNode } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import type { HubAiFeedback } from "@/lib/hub/types";
 
 interface HubAiFeedbackPanelProps {
@@ -28,18 +23,23 @@ function isCompletedMarkdown(
 }
 
 export function HubAiFeedbackPanel({ feedback }: HubAiFeedbackPanelProps) {
-  if (!isCompletedMarkdown(feedback)) return null;
+  if (feedback == null) {
+    return null;
+  }
+
+  const isThinking =
+    feedback.status === "PENDING" || feedback.status === "PROCESSING";
+  const isFailed = feedback.status === "FAILED";
+  const hasMarkdown = isCompletedMarkdown(feedback);
+  const isEmptyCompleted =
+    feedback.status === "COMPLETED" && !hasMarkdown;
 
   return (
-    <aside className="lg:sticky lg:top-24">
-      <Card className="border border-border/70 shadow-sm">
-        <CardHeader className="border-b border-border/70">
-          <CardTitle>AI feedback</CardTitle>
-          <CardDescription>
-            Tóm tắt và gợi ý nhanh do AI phân tích từ nội dung bài đăng.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+    <aside className="min-w-0 lg:sticky lg:top-24 lg:self-start">
+      <HubAiFeedbackChrome>
+        {isThinking ? <HubAiFeedbackThinking /> : null}
+        {isFailed ? <HubAiFeedbackFailed /> : null}
+        {hasMarkdown ? (
           <div className="hub-ai-feedback-markdown text-sm leading-7 text-foreground">
             <Markdown
               components={markdownComponents}
@@ -48,9 +48,97 @@ export function HubAiFeedbackPanel({ feedback }: HubAiFeedbackPanelProps) {
               {feedback.rawResponse}
             </Markdown>
           </div>
-        </CardContent>
-      </Card>
+        ) : null}
+        {isEmptyCompleted ? <HubAiFeedbackEmpty /> : null}
+      </HubAiFeedbackChrome>
     </aside>
+  );
+}
+
+function HubAiFeedbackChrome({ children }: { children: ReactNode }) {
+  return (
+    <div
+      className={cn(
+        "relative overflow-hidden rounded-2xl border border-border/70 bg-card",
+        "shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-8px_rgba(0,0,0,0.08)]",
+        "dark:border-white/10 dark:bg-card/90 dark:shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_12px_40px_-16px_rgba(0,0,0,0.5)]",
+      )}
+    >
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-linear-to-r from-primary/0 via-primary/35 to-primary/0 dark:via-primary/40"
+      />
+      <div className="relative border-b border-border/60 bg-linear-to-b from-muted/50 to-muted/20 px-5 py-4 dark:from-white/4 dark:to-transparent">
+        <div className="flex items-start gap-3">
+          <div
+            className={cn(
+              "flex size-11 shrink-0 items-center justify-center rounded-xl",
+              "bg-primary/10 text-primary shadow-sm ring-1 ring-primary/10",
+              "dark:bg-primary/15 dark:ring-primary/20",
+            )}
+          >
+            <Sparkles className="size-5" aria-hidden />
+          </div>
+          <div className="min-w-0 flex-1 space-y-1 pt-0.5">
+            <h2 className="font-heading text-base font-semibold tracking-tight text-foreground">
+              Phản hồi AI
+            </h2>
+            <p className="text-sm leading-snug text-muted-foreground">
+              Tóm tắt và gợi ý nhanh do AI phân tích từ nội dung bài đăng.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div className="relative px-5 py-5">{children}</div>
+    </div>
+  );
+}
+
+function HubAiFeedbackThinking() {
+  return (
+    <div
+      className="flex flex-col items-center justify-center gap-4 py-8 text-center"
+      role="status"
+      aria-live="polite"
+    >
+      <div className="flex size-14 items-center justify-center rounded-2xl bg-muted/80 dark:bg-white/5">
+        <Loader2
+          className="size-7 animate-spin text-primary"
+          aria-hidden
+        />
+      </div>
+      <div className="space-y-1.5">
+        <p className="text-sm font-medium text-foreground">
+          AI đang suy nghĩ để trả lời feedback của bạn…
+        </p>
+        <p className="mx-auto max-w-[260px] text-xs leading-relaxed text-muted-foreground">
+          Quá trình có thể mất vài phút. Bạn có thể tải lại trang sau để xem kết
+          quả.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function HubAiFeedbackFailed() {
+  return (
+    <div
+      className="flex gap-3 rounded-xl border border-destructive/25 bg-destructive/5 px-4 py-3 text-sm text-destructive dark:border-destructive/30 dark:bg-destructive/10"
+      role="alert"
+    >
+      <AlertCircle className="mt-0.5 size-4 shrink-0" aria-hidden />
+      <p className="leading-relaxed">
+        Không tạo được phản hồi AI lúc này. Vui lòng thử tải lại trang sau.
+      </p>
+    </div>
+  );
+}
+
+function HubAiFeedbackEmpty() {
+  return (
+    <p className="py-2 text-center text-sm text-muted-foreground">
+      Chưa có nội dung phản hồi từ AI.
+    </p>
   );
 }
 

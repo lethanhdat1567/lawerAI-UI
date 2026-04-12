@@ -29,7 +29,7 @@ export function AssistantMarkdownBlock({
   const showTypingPlaceholder = !content && isStreaming;
 
   return (
-    <div className="max-w-3xl text-sm leading-7 text-slate-800 dark:text-slate-200">
+    <div className="max-w-3xl text-xl leading-9 text-slate-800 dark:text-slate-200">
       {content ? (
         <Markdown components={markdownComponents} remarkPlugins={[remarkGfm]}>
           {content}
@@ -121,7 +121,7 @@ function MarkdownCode({ children, className, ...props }: MarkdownCodeProps) {
     <div className="group relative my-4 border border-black/3 dark:border-white/6">
       <SyntaxHighlighter
         PreTag="div"
-        codeTagProps={{ className: "font-mono text-[13px]" }}
+        codeTagProps={{ className: "font-mono text-[15px] leading-relaxed" }}
         customStyle={{
           background: "transparent",
           borderRadius: 0,
@@ -139,7 +139,7 @@ function MarkdownCode({ children, className, ...props }: MarkdownCodeProps) {
 
 function MarkdownParagraph({ children }: MarkdownComponentProps) {
   return (
-    <p className="my-4 leading-7 text-slate-800 dark:text-slate-200">
+    <p className="my-4 leading-9 text-slate-800 dark:text-slate-200">
       {children}
     </p>
   );

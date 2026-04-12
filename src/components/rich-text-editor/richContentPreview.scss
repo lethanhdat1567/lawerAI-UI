@@ -4,6 +4,8 @@
     padding: 1rem 1rem 1.25rem;
     min-height: 120px;
     outline: none;
+    /* Read-only: avoid inter-tag newlines becoming visible gaps (editor keeps pre-wrap). */
+    white-space: normal;
   }
 }
 
